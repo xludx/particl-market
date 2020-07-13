@@ -349,7 +349,6 @@ export class CoreRpcService extends CtRpc {
         const address = await this.call('getnewaddress', params);
 
         if (smsgAddress) {
-            // call﻿smsgaddlocaladdress, even though I'm not sure if its required
             const addLocalAddressResponse = await this.call('smsgaddlocaladdress', [address]);
             this.log.debug('addLocalAddressResponse: ', addLocalAddressResponse);
 

@@ -27,6 +27,7 @@ import { SmsgSendParams } from '../../requests/action/SmsgSendParams';
 import { BidRequest } from '../../requests/action/BidRequest';
 import { AddressCreateRequest } from '../../requests/model/AddressCreateRequest';
 import { AddressType } from '../../enums/AddressType';
+import { SmsgService } from '../../services/SmsgService';
 
 export class BidSendCommand extends BaseCommand implements RpcCommandInterface<SmsgSendResponse> {
 
@@ -56,6 +57,7 @@ export class BidSendCommand extends BaseCommand implements RpcCommandInterface<S
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
         @inject(Types.Service) @named(Targets.Service.model.ListingItemService) private listingItemService: ListingItemService,
+        @inject(Types.Service) @named(Targets.Service.SmsgService) private smsgService: SmsgService,
         @inject(Types.Service) @named(Targets.Service.model.AddressService) private addressService: AddressService,
         @inject(Types.Service) @named(Targets.Service.model.ProfileService) private profileService: ProfileService,
         @inject(Types.Service) @named(Targets.Service.action.BidActionService) private bidActionService: BidActionService
@@ -102,6 +104,9 @@ export class BidSendCommand extends BaseCommand implements RpcCommandInterface<S
             listingItem,
             address
         } as BidRequest;
+
+        // make sure smsg is enabled for the profile address
+        await this.smsgService.smsgAddLocalAddress(fromAddress);
 
         this.log.debug('postRequest: ', JSON.stringify(postRequest, null, 2));
         const response: SmsgSendResponse = await this.bidActionService.post(postRequest);

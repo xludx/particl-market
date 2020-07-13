@@ -56,6 +56,9 @@ export class DefaultProfileService {
                 } as ProfileCreateRequest)
                     .then(value => value.toJSON());
 
+                // make sure smsg is enabled for the profile address
+                await this.smsgService.smsgAddLocalAddress(address);
+
                 // create Wallet for default Profile
                 const walletInfo: RpcWalletInfo = await this.coreRpcService.getWalletInfo();
                 this.log.debug('walletInfo: ', JSON.stringify(walletInfo, null, 2));
