@@ -16,6 +16,7 @@ import { SettingValue } from '../enums/SettingValue';
 import { SettingCreateRequest } from '../requests/model/SettingCreateRequest';
 import { WalletCreateRequest } from '../requests/model/WalletCreateRequest';
 import { WalletService } from './model/WalletService';
+import { SmsgService } from './SmsgService';
 
 export class DefaultProfileService {
 
@@ -24,6 +25,7 @@ export class DefaultProfileService {
     constructor(
         @inject(Types.Service) @named(Targets.Service.model.ProfileService) public profileService: ProfileService,
         @inject(Types.Service) @named(Targets.Service.CoreRpcService) public coreRpcService: CoreRpcService,
+        @inject(Types.Service) @named(Targets.Service.SmsgService) public smsgService: SmsgService,
         @inject(Types.Service) @named(Targets.Service.model.SettingService) public settingService: SettingService,
         @inject(Types.Service) @named(Targets.Service.model.WalletService) public walletService: WalletService,
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
@@ -55,6 +57,9 @@ export class DefaultProfileService {
                     address
                 } as ProfileCreateRequest)
                     .then(value => value.toJSON());
+
+                // make sure smsg is enabled for the profile address
+                await this.smsgService.smsgAddLocalAddress(address);
 
                 // create Wallet for default Profile
                 const walletInfo: RpcWalletInfo = await this.coreRpcService.getWalletInfo();

@@ -238,4 +238,29 @@ export class SmsgService {
                 return false;
             });
     }
+
+    /**
+     * Enable receiving messages on <address>.
+     * Key for "address" must exist in the wallet.
+     *
+     * @param {string} address
+     * @returns {Promise<boolean>}
+     */
+    public async smsgAddLocalAddress(address: string): Promise<boolean> {
+        return await this.coreRpcService.call('smsgaddlocaladdress', [address])
+            .then(response => {
+                this.log.debug('smsgAddLocalAddress, response: ' + JSON.stringify(response, null, 2));
+                if (response.result === 'Receiving messages enabled for address.'
+                    || (response.result === 'Address not added.' && response.reason === 'Key exists in database')) {
+                    return true;
+                } else {
+                    return false;
+                }
+            })
+            .catch(error => {
+                this.log.error('smsgAddLocalAddress failed: ', error);
+                return false;
+            });
+    }
+
 }
