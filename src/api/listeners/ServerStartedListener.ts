@@ -20,8 +20,9 @@ import { ProposalResultProcessor } from '../messageprocessors/ProposalResultProc
 import { DefaultSettingService } from '../services/DefaultSettingService';
 import { SettingValue } from '../enums/SettingValue';
 import { SettingService } from '../services/model/SettingService';
-import {CoreCookieService} from '../services/CoreCookieService';
-import {Environment} from '../../core/helpers/Environment';
+import { CoreCookieService } from '../services/CoreCookieService';
+import { Environment } from '../../core/helpers/Environment';
+import { SmsgService } from '../services/SmsgService';
 
 export class ServerStartedListener implements interfaces.Listener {
 
@@ -47,6 +48,7 @@ export class ServerStartedListener implements interfaces.Listener {
         @inject(Types.Service) @named(Targets.Service.model.SettingService) public settingService: SettingService,
         @inject(Types.Service) @named(Targets.Service.CoreCookieService) public coreCookieService: CoreCookieService,
         @inject(Types.Service) @named(Targets.Service.CoreRpcService) public coreRpcService: CoreRpcService,
+        @inject(Types.Service) @named(Targets.Service.SmsgService) public smsgService: SmsgService,
         @inject(Types.Core) @named(Core.Events) public eventEmitter: EventEmitter,
         @inject(Types.Core) @named(Core.Logger) Logger: typeof LoggerType
     ) {
@@ -125,6 +127,9 @@ export class ServerStartedListener implements interfaces.Listener {
                         // seed the default market
                         const defaultMarket: resources.Market = await this.defaultMarketService.seedDefaultMarket(defaultProfile)
                             .then(value => value.toJSON());
+
+                        // make sure the address is added as smsg receive addresses
+                        await this.smsgService.smsgAddLocalAddress(defaultMarket.receiveAddress);
 
                         // seed the default categories
                         await this.defaultItemCategoryService.seedDefaultCategories(defaultMarket.receiveAddress);

@@ -39,11 +39,12 @@ export class DefaultProfileService {
             .then(value => value.toJSON());
         const defaultProfileSetting = defaultProfileSettings[0];
 
+        let profile: Profile;
+
         // not set yet
         if (_.isEmpty(defaultProfileSetting)) {
 
             // if some profile exists, set that one as the default
-            let profile: resources.Profile;
             const profiles = await this.profileService.findAll().then(value => value.toJSON());
             if (profiles.length > 0) {
                 profile = profiles[0];
@@ -57,9 +58,6 @@ export class DefaultProfileService {
                     address
                 } as ProfileCreateRequest)
                     .then(value => value.toJSON());
-
-                // make sure smsg is enabled for the profile address
-                await this.smsgService.smsgAddLocalAddress(address);
 
                 // create Wallet for default Profile
                 const walletInfo: RpcWalletInfo = await this.coreRpcService.getWalletInfo();
@@ -85,10 +83,15 @@ export class DefaultProfileService {
                 value: '' + profile.id
             } as SettingCreateRequest);
 
-            return await this.profileService.findOne(profile.id, true);
+            profile = await this.profileService.findOne(profile.id, true);
         } else {
-            return await this.profileService.findOne(+defaultProfileSetting.value, true);
+            profile = await this.profileService.findOne(+defaultProfileSetting.value, true);
         }
+
+        // make sure smsg is enabled for the profile address
+        await this.smsgService.smsgAddLocalAddress(profile.Address);
+
+        return profile;
     }
 
 }
