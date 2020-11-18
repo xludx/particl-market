@@ -9,6 +9,7 @@ import { Profile } from './Profile';
 import { SearchOrder } from '../enums/SearchOrder';
 import { NotificationSearchOrderField } from '../enums/SearchOrderField';
 import { NotificationSearchParams } from '../requests/search/NotificationSearchParams';
+import {ActionMessageTypes} from '../enums/ActionMessageTypes';
 
 
 export class Notification extends Bookshelf.Model<Notification> {
@@ -47,6 +48,16 @@ export class Notification extends Bookshelf.Model<Notification> {
 
                 if (options.profileId) {
                     qb.where('profile_id', '=', options.profileId);
+                }
+
+                if (!_.isEmpty(options.types)) {
+                    qb.whereIn('type', options.types as ActionMessageTypes[]);
+                }
+
+                if (!_.isEmpty(options.category)) {
+                    qb.andWhere( qbInner => {
+                        return qbInner.where('category', '=', options.category.toString());
+                    });
                 }
 
                 if (!_.isNil(options.read)) {
