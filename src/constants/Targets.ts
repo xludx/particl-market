@@ -197,7 +197,8 @@ export const Targets = {
             AddressUpdateCommand: 'AddressUpdateCommand'
         },
         admin: {
-            AdminCommand: 'AdminCommand'
+            AdminCommand: 'AdminCommand',
+            StatusCommand: 'StatusCommand'
         },
         BaseCommand: 'BaseCommand',
         BaseSearchCommand: 'BaseSearchCommand',

@@ -28,6 +28,7 @@ import { DataCleanCommand } from '../commands/data/DataCleanCommand';
 import { DataRootCommand } from '../commands/data/DataRootCommand';
 import { DataGenerateCommand } from '../commands/data/DataGenerateCommand';
 import { AdminCommand } from '../commands/admin/AdminCommand';
+import { StatusCommand } from '../commands/admin/StatusCommand';
 import { EscrowRootCommand } from '../commands/escrow/EscrowRootCommand';
 import { EscrowCompleteCommand } from '../commands/escrow/EscrowCompleteCommand';
 import { EscrowUpdateCommand } from '../commands/escrow/EscrowUpdateCommand';
@@ -176,6 +177,7 @@ export class RpcCommandFactory {
         @inject(Types.Command) @named(Targets.Command.comment.CommentCountCommand) private commentCountCommand: CommentCountCommand,
 
         @inject(Types.Command) @named(Targets.Command.admin.AdminCommand) private adminCommand: AdminCommand,
+        @inject(Types.Command) @named(Targets.Command.admin.StatusCommand) private statusCommand: StatusCommand,
 
         @inject(Types.Command) @named(Targets.Command.data.DataAddCommand) private dataAddCommand: DataAddCommand,
         @inject(Types.Command) @named(Targets.Command.data.DataCleanCommand) private dataCleanCommand: DataCleanCommand,
@@ -358,6 +360,7 @@ export class RpcCommandFactory {
         this.commands.push(commentCountCommand);
 
         this.commands.push(adminCommand);
+        this.commands.push(statusCommand);
 
         this.commands.push(dataAddCommand);
         this.commands.push(dataCleanCommand);
@@ -535,7 +538,7 @@ export class RpcCommandFactory {
                 if (commandType.commandType === EnvironmentType.ALL || Environment.isDevelopment() || Environment.isTest()) {
                     return commandInstance;
                 } else {
-                    // this.log.debug('Environment not correct to get ' + commandInstance.getCommand().toString());
+                    this.log.debug('Environment not correct to get ' + commandInstance.getCommand().toString());
                 }
             }
         }

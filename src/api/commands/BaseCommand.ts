@@ -7,11 +7,11 @@ import { CommandEnumType, Commands } from './CommandEnumType';
 import { Command } from './Command';
 import { RpcRequest } from '../requests/RpcRequest';
 import { RpcCommandFactory } from '../factories/RpcCommandFactory';
-import { NotFoundException } from '../exceptions/NotFoundException';
 import { MissingParamException } from '../exceptions/MissingParamException';
 import { InvalidParamException } from '../exceptions/InvalidParamException';
 import { Logger as LoggerType } from '../../core/Logger';
 import { CommandParamValidationRules, ParamValidationRule } from './CommandParamValidation';
+import { MessageException } from '../exceptions/MessageException';
 
 
 export abstract class BaseCommand {
@@ -53,7 +53,7 @@ export abstract class BaseCommand {
             // execute
             return await rpcCommand.execute(request, commandFactory);
         } else {
-            throw new NotFoundException('Unknown subcommand: ' + commandName + '\n');
+            throw new MessageException('Unknown subcommand: ' + commandName + '\n');
         }
     }
 

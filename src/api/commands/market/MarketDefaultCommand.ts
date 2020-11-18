@@ -98,8 +98,8 @@ export class MarketDefaultCommand extends BaseCommand implements RpcCommandInter
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <profileId>              - Number - The ID of the Profile. \n'
-            + '    <marketId>               - Number - The ID of the Market. \n';
+            + '    <profileId>              - number, The ID of the Profile. \n'
+            + '    <marketId>               - [optional] number, The ID of the Market. \n';
     }
 
     public description(): string {

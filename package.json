@@ -1,7 +1,7 @@
 {
   "name": "particl-marketplace",
   "version": "0.3.0",
-  "description": "",
+  "description": "decentralized marketplace",
   "main": "dist/module.js",
   "scripts": {
     "setup": "yarn install && npm run banner setup && npm run db:migrate && npm run db:seed",
