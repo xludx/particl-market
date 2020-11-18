@@ -19,8 +19,9 @@ export class CommandEnumType extends Enum<Command> {
         [this.DATA_ADD, this.DATA_GENERATE, this.DATA_CLEAN], EnvironmentType.DEVELOPMENT);
 
     // public ADMIN_DATA: Command    = new Command('admindata', 'data', true); // link to root
+    public ADMIN_STATUS: Command    = new Command('adminstatus', 'status', false);
     public ADMIN_ROOT: Command      = new Command('admin', 'admin', true,
-        [this.DATA_ROOT], EnvironmentType.DEVELOPMENT);
+        [this.ADMIN_STATUS, this.DATA_ROOT], EnvironmentType.DEVELOPMENT);
 
     public BID_SEARCH: Command      = new Command('bidsearch', 'search', false);
     public BID_GET: Command         = new Command('bidget', 'get', false);

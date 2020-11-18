@@ -43,6 +43,7 @@ export abstract class BaseObserverService {
             this.status = await this.run(this.status)
                 .catch(reason => {
                     this.log.error('ERROR: ', reason);
+                    this.status = ObserverStatus.ERROR;
                     return ObserverStatus.ERROR;
                 });
             this.updated = Date.now();
@@ -52,12 +53,13 @@ export abstract class BaseObserverService {
             await delay(this.INTERVAL);
 
             return previousValue;
-        }, 0).catch(async reason => {
-            this.status = ObserverStatus.ERROR;
-            this.log.error('ERROR: ', reason);
-            await delay(this.INTERVAL);
-            this.start();
-        });
+        }, 0)
+            .catch(async reason => {
+                this.status = ObserverStatus.ERROR;
+                this.log.error('ERROR: ', reason);
+                await delay(this.INTERVAL);
+                this.start();
+            });
 
         this.log.error('BaseObserver stopped!');
     }

@@ -12,9 +12,8 @@ import { Commands } from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
 import { RpcCommandFactory } from '../../factories/RpcCommandFactory';
 
-export class AdminCommand extends BaseCommand implements RpcCommandInterface<any> {
 
-    public log: LoggerType;
+export class AdminCommand extends BaseCommand implements RpcCommandInterface<any> {
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
@@ -23,13 +22,6 @@ export class AdminCommand extends BaseCommand implements RpcCommandInterface<any
         this.log = new Logger(__filename);
     }
 
-    /**
-     * admin root command, passes the execution to the next command, which is the first in data.params
-     *
-     * @param data
-     * @param rpcCommandFactory
-     * @returns {Promise<any>}
-     */
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest, rpcCommandFactory: RpcCommandFactory): Promise<any> {
         return await this.executeNext(data, rpcCommandFactory);
@@ -40,7 +32,7 @@ export class AdminCommand extends BaseCommand implements RpcCommandInterface<any
     }
 
     public usage(): string {
-        return this.getName() + ' (data)  -  ' + this.description();
+        return this.getName() + ' (data|status)  -  ' + this.description();
     }
 
     public help(): string {
