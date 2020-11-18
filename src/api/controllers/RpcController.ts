@@ -15,6 +15,7 @@ import { RpcCommandFactory } from '../factories/RpcCommandFactory';
 import { RpcRequest } from '../requests/RpcRequest';
 import { Commands} from '../commands/CommandEnumType';
 import { RpcCommandInterface } from '../commands/RpcCommandInterface';
+import {Environment} from '../../core/helpers/Environment';
 
 // Get middlewares
 const rpc = app.IoC.getNamed<interfaces.Middleware>(Types.Middleware, Targets.Middleware.RpcMiddleware);
@@ -40,10 +41,12 @@ export class RpcController {
 
         let rpcRequest: RpcRequest = this.createRequest(body.method, body.params, body.id);
 
-        if (rpcRequest.method === Commands.IMAGE_ROOT.commandName && rpcRequest.params[0] === Commands.IMAGE_ADD.commandName) {
-            this.log.debug('controller.handleRPC():', rpcRequest.method + ' ' + rpcRequest.params[0] + '...');
-        } else {
-            this.log.debug('controller.handleRPC():', rpcRequest.method + ' ' + rpcRequest.params);
+        if (Environment.isTruthy(process.env.LOG_RPC_INCOMING)) {
+            if (rpcRequest.method === Commands.IMAGE_ROOT.commandName && rpcRequest.params[0] === Commands.IMAGE_ADD.commandName) {
+                this.log.debug('controller.handleRPC():', rpcRequest.method + ' ' + rpcRequest.params[0] + '...');
+            } else {
+                this.log.debug('controller.handleRPC():', rpcRequest.method + ' ' + rpcRequest.params);
+            }
         }
 
         // get the commandType for the method name

@@ -87,7 +87,6 @@ export class ListingItemAddActionService extends BaseActionService {
      * @param marketplaceMessage
      */
     public async beforePost(actionRequest: ListingItemAddRequest, marketplaceMessage: MarketplaceMessage): Promise<MarketplaceMessage> {
-        this.log.debug('beforePost()');
         return marketplaceMessage;
     }
 
@@ -101,7 +100,6 @@ export class ListingItemAddActionService extends BaseActionService {
      */
     public async afterPost(actionRequest: ListingItemAddRequest, marketplaceMessage: MarketplaceMessage, smsgMessage: resources.SmsgMessage,
                            smsgSendResponse: SmsgSendResponse): Promise<SmsgSendResponse> {
-        this.log.debug('afterPost()');
         return smsgSendResponse;
     }
 

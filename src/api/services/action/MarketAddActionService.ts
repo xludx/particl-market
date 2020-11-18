@@ -87,8 +87,6 @@ export class MarketAddActionService extends BaseActionService {
      * @param marketplaceMessage
      */
     public async beforePost(actionRequest: MarketAddRequest, marketplaceMessage: MarketplaceMessage): Promise<MarketplaceMessage> {
-        this.log.debug('beforePost()');
-
         // convert MarketType.STOREFRONT_ADMIN to MarketType.STOREFRONT
         const marketAddMessage: MarketAddMessage = marketplaceMessage.action as MarketAddMessage;
         if (marketAddMessage.marketType === MarketType.STOREFRONT_ADMIN) {
@@ -109,7 +107,6 @@ export class MarketAddActionService extends BaseActionService {
      */
     public async afterPost(actionRequest: MarketAddRequest, marketplaceMessage: MarketplaceMessage, smsgMessage: resources.SmsgMessage,
                            smsgSendResponse: SmsgSendResponse): Promise<SmsgSendResponse> {
-        // this.log.debug('afterPost()');
         return smsgSendResponse;
     }
 

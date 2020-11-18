@@ -155,7 +155,7 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
         delete body.listingItemObjects;
 
         const listingItemTemplate: resources.ListingItemTemplate = await this.listingItemTemplateRepo.create(body).then(value => value.toJSON());
-        this.log.debug('create(), listingItemTemplate.id:', listingItemTemplate.id);
+        // this.log.debug('create(), listingItemTemplate.id:', listingItemTemplate.id);
 
         if (!_.isEmpty(itemInformation)) {
             itemInformation.listing_item_template_id = listingItemTemplate.id;

@@ -898,7 +898,7 @@ export class CoreRpcService extends CtRpc {
      */
     public async signMessage(wallet: string, address: string, message: VerifiableMessage): Promise<string> {
         const signableMessage = JSON.stringify(message).split('').sort().toString();
-        this.log.debug('signMessage(), signableMessage: \"' + signableMessage + '\"');
+        // this.log.debug('signMessage(), signableMessage: \"' + signableMessage + '\"');
         return await this.call('signmessage', [address, signableMessage], wallet);
     }
 
@@ -912,7 +912,7 @@ export class CoreRpcService extends CtRpc {
      */
     public async verifyMessage(address: string, signature: string, message: VerifiableMessage): Promise<boolean> {
         const signableMessage = JSON.stringify(message).split('').sort().toString();
-        this.log.debug('verifyMessage(), signableMessage: \"' + signableMessage + '\"');
+        // this.log.debug('verifyMessage(), signableMessage: \"' + signableMessage + '\"');
         return await this.call('verifymessage', [address, signature, signableMessage]);
     }
 

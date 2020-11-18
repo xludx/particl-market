@@ -118,18 +118,18 @@ export class CoreMessageProcessor implements MessageProcessorInterface {
             message: msg
         } as SmsgMessageCreateParams);
 
-        this.log.debug('SAVING msgid:', JSON.stringify(msg.msgid, null, 2));
+        // this.log.debug('SAVING msgid:', JSON.stringify(msg.msgid, null, 2));
 
         // store in db
         return await this.smsgMessageService.create(smsgMessageCreateRequest)
             .then(async (value) => {
                 const smsgMessage: resources.SmsgMessage = value.toJSON();
-                this.log.debug('CREATED msgid:', JSON.stringify(smsgMessage.msgid, null, 2));
+                // this.log.debug('created SmsgMessage, msgid:', JSON.stringify(smsgMessage.msgid, null, 2));
 
                 // after the smsgMessage is stored, remove it
                 await this.smsgService.smsg(msg.msgid, true, true)
                     .then(removed => {
-                        this.log.debug('REMOVED: ', JSON.stringify(removed.msgid, null, 2));
+                        // this.log.debug('REMOVED: ', JSON.stringify(removed.msgid, null, 2));
                     });
                 return smsgMessage;
             });

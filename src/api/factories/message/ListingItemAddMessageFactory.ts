@@ -159,9 +159,9 @@ export class ListingItemAddMessageFactory extends BaseMessageFactory {
             hash            // item hash
         } as SellerMessage;
 
-        this.log.debug('signSellerMessage(), message: ', JSON.stringify(message, null, 2));
-        this.log.debug('signSellerMessage(), address: ', address);
-        this.log.debug('signSellerMessage(), hash: ', hash);
+        // this.log.debug('signSellerMessage(), message: ', JSON.stringify(message, null, 2));
+        // this.log.debug('signSellerMessage(), address: ', address);
+        // this.log.debug('signSellerMessage(), hash: ', hash);
 
         return await this.coreRpcService.signMessage(wallet, address, message);
     }

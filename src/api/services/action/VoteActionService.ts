@@ -109,7 +109,7 @@ export class VoteActionService extends BaseActionService {
      * @param marketplaceMessage
      */
     public async beforePost(actionRequest: VoteRequest, marketplaceMessage: MarketplaceMessage): Promise<MarketplaceMessage> {
-        this.log.debug('beforePost(), marketplaceMessage:', JSON.stringify(marketplaceMessage, null, 2));
+        // this.log.debug('beforePost(), marketplaceMessage:', JSON.stringify(marketplaceMessage, null, 2));
         return marketplaceMessage;
     }
 
