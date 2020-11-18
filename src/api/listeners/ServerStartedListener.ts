@@ -95,9 +95,11 @@ export class ServerStartedListener implements interfaces.Listener {
         await pForever(async (i) => {
             i++;
 
-            this.log.debug('this.coreCookieService.status: ' + this.coreCookieService.status);
-            this.log.debug('this.coreConnectionStatusService.status: ' + this.coreConnectionStatusService.connectionStatus);
-            this.log.debug('this.BOOTSTRAPPING: ' + this.BOOTSTRAPPING);
+            // this.log.debug('this.coreCookieService.status: ' + this.coreCookieService.status);
+            // this.log.debug('this.coreConnectionStatusService.status: ' + this.coreConnectionStatusService.connectionStatus);
+            if (this.BOOTSTRAPPING) {
+                this.log.debug('bootstrapping...');
+            }
 
             // keep checking whether we are connected to the core and when we are, call this.bootstrap()
             // then STOP the polling, if bootstrap was successful
@@ -122,7 +124,7 @@ export class ServerStartedListener implements interfaces.Listener {
                 return pForever.end;
             }
             await delay(this.INTERVAL);
-            this.log.debug('ServerStartedListener.start(), i: ', i);
+            // this.log.debug('ServerStartedListener.start(), i: ', i);
 
             return i;
         }, 0).catch(async reason => {
@@ -149,7 +151,7 @@ export class ServerStartedListener implements interfaces.Listener {
 
         // are we updating from previous installation (a market wallet already exists+no profile identity)
         const isUpgradingFromSingleMarketWallet = await this.isUpgradingFromSingleMarketWallet();
-        this.log.debug('bootstrap(), isUpgradingFromSingleMarketWallet: ', isUpgradingFromSingleMarketWallet);
+        // this.log.debug('bootstrap(), isUpgradingFromSingleMarketWallet: ', isUpgradingFromSingleMarketWallet);
 
         let defaultProfile: resources.Profile;
         if (isUpgradingFromSingleMarketWallet) {
@@ -193,22 +195,7 @@ export class ServerStartedListener implements interfaces.Listener {
                     throw reason;
                 });
 
-            // this.log.debug('bootstrap(), defaultMarket: ', JSON.stringify(defaultMarket, null, 2));
-
-            // todo: Seed the default custom ItemCategories for a Market
-            // await this.defaultItemCategoryService.seedDefaultCategories(defaultMarket.receiveAddress);
-
-            // this.log.debug('bootstrap(), process.env.NODE_ENV:', process.env.NODE_ENV);
-
-            // start message polling and other stuff, unless we're running integration tests
             if (process.env.NODE_ENV !== 'test') {
-
-                // this.expiredListingItemProcessor.scheduleProcess();
-                // this.proposalResultRecalcService.scheduleProcess();
-
-                // poll for waiting smsgmessages to be processed
-                // this.waitingMessageProcessor.schedulePoll();
-
                 // request new messages to be pushed through zmq
                 await this.smsgService.pushUnreadCoreSmsgMessages();
             }
@@ -246,7 +233,7 @@ export class ServerStartedListener implements interfaces.Listener {
     private async isUpgradingFromSingleMarketWallet(): Promise<boolean> {
 
         const hasMarketWallet = await this.coreRpcService.walletExists('market');
-        this.log.debug('isUpgradingFromSingleMarketWallet(), hasMarketWallet: ', hasMarketWallet);
+        // this.log.debug('isUpgradingFromSingleMarketWallet(), hasMarketWallet: ', hasMarketWallet);
 
         if (!hasMarketWallet) {
             // if we dont have the market wallet, we can't be upgrading it
@@ -267,7 +254,7 @@ export class ServerStartedListener implements interfaces.Listener {
         const profileIdentity: resources.Identity | undefined = _.find(defaultProfile.Identities, identity => {
             return identity.type === IdentityType.PROFILE;
         });
-        this.log.debug('isUpdatingFromSingleMarketWallet(), profileIdentity: ', profileIdentity);
+        // this.log.debug('isUpdatingFromSingleMarketWallet(), profileIdentity: ', profileIdentity);
 
         // there is old market wallet, but no Profile Identity was found -> need to update
         if (hasMarketWallet && _.isEmpty(profileIdentity)) {

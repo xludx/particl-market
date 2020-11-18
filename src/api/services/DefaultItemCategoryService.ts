@@ -133,7 +133,7 @@ export class DefaultItemCategoryService {
         await this.itemCategoryService.insertOrUpdateCategory({ name: 'Coins', description: '', market } as ItemCategoryCreateRequest, [ROOT, LEVEL1CHILD]);
         await this.itemCategoryService.insertOrUpdateCategory({ name: 'Other', description: '', market } as ItemCategoryCreateRequest, [ROOT, LEVEL1CHILD]);
 
-        this.log.debug('default categories update, DONE');
+        this.log.debug('Default categories updated!');
     }
     // tslint:enable:max-line-length
 

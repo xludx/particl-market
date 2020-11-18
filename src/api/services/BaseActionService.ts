@@ -138,7 +138,7 @@ export abstract class BaseActionService implements ActionServiceInterface {
             marketplaceMessage.action.objects.push(...(actionRequest.objects ? actionRequest.objects : []));
         }
 
-        // set process.env.MPMESSAGE_DEBUG=true to enable this
+        // set process.env.LOG_MPMESSAGE=true to enable this
         this.marketplaceMessageDebug(ActionDirection.OUTGOING, marketplaceMessage.action);
 
         // validate message with the messageValidator
@@ -317,7 +317,7 @@ export abstract class BaseActionService implements ActionServiceInterface {
     }
 
     public marketplaceMessageDebug(direction: ActionDirection, actionRequest: ActionMessageInterface): void {
-        if (Environment.isTruthy(process.env.MPMESSAGE_DEBUG)) {
+        if (Environment.isTruthy(process.env.LOG_MPMESSAGE)) {
             this.log.debug(direction + ': ', JSON.stringify(actionRequest, null, 2));
         }
     }

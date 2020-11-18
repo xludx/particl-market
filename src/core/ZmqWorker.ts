@@ -46,8 +46,6 @@ export class ZmqWorker {
     }
 
     private configure(): ParticlZmq {
-        this.log.debug('Configuring ZmqWorker');
-
         const host = (process.env.RPCHOSTNAME ? process.env.RPCHOSTNAME : '127.0.0.1');
         const port = (process.env.ZMQ_PORT ? process.env.ZMQ_PORT : 54235);
         const addr = 'tcp://' + host + ':' + port;
@@ -115,7 +113,7 @@ export class ZmqWorker {
             this.log.debug('ZMQ: error:* ' + type + ', error: ' + err);
         });
 
-        this.log.debug('ZMQ: CONFIGURED!');
+        this.log.info('ZMQ configured!');
 
         // TODO: .env
 
