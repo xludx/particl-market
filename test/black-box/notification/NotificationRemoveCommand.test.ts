@@ -15,6 +15,8 @@ import { GenerateListingItemTemplateParams } from '../../../src/api/requests/tes
 import { CreatableModel } from '../../../src/api/enums/CreatableModel';
 import { ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
 import { MissingParamException } from '../../../src/api/exceptions/MissingParamException';
+import {MPAction} from 'omp-lib/dist/interfaces/omp-enums';
+import {MPActionExtended} from '../../../src/api/enums/MPActionExtended';
 
 
 describe('NotificationRemoveCommand', () => {
@@ -248,9 +250,11 @@ describe('NotificationRemoveCommand', () => {
     }, 600000); // timeout to 600s
 
 
-    test('Should return 3 Notifications', async () => {
+    test('Should return 2-3 Notifications', async () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            null,
+            [MPAction.MPA_LISTING_ADD, MPActionExtended.MPA_LISTING_IMAGE_ADD],
             null,
             false
         ]);
@@ -295,9 +299,11 @@ describe('NotificationRemoveCommand', () => {
     });
 
 
-    test('Should return two', async () => {
+    test('Should return 1-2', async () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            null,
+            [MPAction.MPA_LISTING_ADD, MPActionExtended.MPA_LISTING_IMAGE_ADD],
             null,
             false
         ]);
@@ -306,7 +312,7 @@ describe('NotificationRemoveCommand', () => {
         const results: resources.Notification[] = res.getBody()['result'];
 
         log.debug('results: ', JSON.stringify(results, null, 2));
+        expect(results.length).toBe(imageCount);
 
-        expect(results.length).toBe(2);
     });
 });

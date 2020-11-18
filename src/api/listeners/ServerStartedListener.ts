@@ -120,7 +120,7 @@ export class ServerStartedListener implements interfaces.Listener {
 
             this.updated = Date.now();
             if (this.STOP) {
-                this.log.debug('ServerStartedListener.start() finished.');
+                this.log.info('Server started!');
                 return pForever.end;
             }
             await delay(this.INTERVAL);
@@ -204,7 +204,7 @@ export class ServerStartedListener implements interfaces.Listener {
             throw new MessageException('Missing default Market configuration.');
         }
 
-        this.log.info('bootstrap(), DONE');
+        this.log.debug('bootstrap(), done.');
 
         return true;
     }

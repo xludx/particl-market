@@ -66,7 +66,7 @@ export class ListingItemAddValidator extends FV_MPA_LISTING implements ActionMes
                 this.log.error('MPA_LISTING_ADD failed validation: Invalid message sender.');
                 throw new MessageException('Invalid message sender.');
             } else {
-                this.log.debug('validateMessage(), publishAddress is valid.');
+                // this.log.debug('validateMessage(), publishAddress is valid.');
             }
 
             // - receive/process listingitems:
@@ -85,7 +85,6 @@ export class ListingItemAddValidator extends FV_MPA_LISTING implements ActionMes
                             // no matching default category found
                             throw new MessageException('ItemCategory not found.');
                         });
-                    this.log.debug('validateMessage(), itemCategory is valid.');
                     return true;
                 case MarketType.STOREFRONT:
                 case MarketType.STOREFRONT_ADMIN:
@@ -158,9 +157,9 @@ export class ListingItemAddValidator extends FV_MPA_LISTING implements ActionMes
         } as SellerMessage;
 
         // this.log.debug('verifySellerMessage(), message: ', JSON.stringify(message, null, 2));
-        this.log.debug('verifySellerMessage(), address: ', address);
-        this.log.debug('verifySellerMessage(), hash: ', itemHash);
-        this.log.debug('verifySellerMessage(), signature: ', signature);
+        // this.log.debug('verifySellerMessage(), address: ', address);
+        // this.log.debug('verifySellerMessage(), hash: ', itemHash);
+        // this.log.debug('verifySellerMessage(), signature: ', signature);
 
         const verified = await this.coreRpcService.verifyMessage(address, signature, message);
         this.log.debug('verifySellerMessage(), verified: ', verified);

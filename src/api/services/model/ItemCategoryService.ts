@@ -154,7 +154,7 @@ export class ItemCategoryService {
         await this.findRoot(market)
             .then(value => value.toJSON())
             .catch(async reason => {
-                this.log.error('rootCategory not found, fixing it...');
+                this.log.debug('rootCategory not found, adding...');
                 return await this.insertRootItemCategoryForMarket(market).then(value => value.toJSON());
             });
 
@@ -167,7 +167,7 @@ export class ItemCategoryService {
 
             // first: [ROOT], then: [ROOT, cat0name], then: [ROOT, cat0name, cat1name]
             currentPathToLookFor[index] = categoryName;
-            this.log.debug('createMarketCategoriesFromArray(), currentPathToLookFor: ', currentPathToLookFor);
+            // this.log.debug('createMarketCategoriesFromArray(), currentPathToLookFor: ', currentPathToLookFor);
             index++;
 
             const keyForPath = this.itemCategoryFactory.keyForItemCategoryArray(currentPathToLookFor);
@@ -177,7 +177,7 @@ export class ItemCategoryService {
                 .then(value => value.toJSON())
                 .catch(async reason => {
 
-                    this.log.debug('createMarketCategoriesFromArray(), missing category: ' + keyForPath + ', for market: ' + market);
+                    this.log.debug('adding missing category: ' + keyForPath + ', for market: ' + market);
                     // there was no child category, then create it
                     // root should have always been found, so parentCategory is always set
                     const createRequest: ItemCategoryCreateRequest = await this.itemCategoryFactory.get({

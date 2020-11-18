@@ -1441,9 +1441,9 @@ export class TestDataService {
         const createRequests: ImageCreateRequest[] = [];
         for (let i = amount; i > 0; i--) {
             const data = await this.generateRandomImage(width, height);
-            this.log.debug('image.height: ', height);
-            this.log.debug('image.width: ', width);
-            this.log.debug('image.size: ', data.length);
+            // this.log.debug('image.height: ', height);
+            // this.log.debug('image.width: ', width);
+            // this.log.debug('image.size: ', data.length);
 
             const createRequest: ImageCreateRequest = await this.imageFactory.get({
                 actionMessage: {

@@ -16,6 +16,7 @@ import { CreatableModel } from '../../../src/api/enums/CreatableModel';
 import { ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
 import { MPActionExtended } from '../../../src/api/enums/MPActionExtended';
 import { MissingParamException } from '../../../src/api/exceptions/MissingParamException';
+import { MPAction } from 'omp-lib/dist/interfaces/omp-enums';
 
 
 describe('NotificationSetReadCommand', () => {
@@ -253,6 +254,8 @@ describe('NotificationSetReadCommand', () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
             null,
+            [MPAction.MPA_LISTING_ADD, MPActionExtended.MPA_LISTING_IMAGE_ADD],
+            null,
             false
         ]);
         res.expectJson();
@@ -314,6 +317,8 @@ describe('NotificationSetReadCommand', () => {
     test('Should return 1 read', async () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            null,
+            [MPAction.MPA_LISTING_ADD, MPActionExtended.MPA_LISTING_IMAGE_ADD],
             null,
             true
         ]);

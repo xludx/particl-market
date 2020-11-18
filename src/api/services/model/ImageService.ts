@@ -137,11 +137,11 @@ export class ImageService {
         if (originalImageData.data) {
             // if data for the original image exists, then create the other versions
             const originalData = await ImageProcessing.convertToJPEG(originalImageData.data);
-            this.log.debug('createVersions(), convertToJPEG: ' + (Date.now() - startTime) + 'ms');
+            // this.log.debug('createVersions(), convertToJPEG: ' + (Date.now() - startTime) + 'ms');
 
             startTime = Date.now();
             const resizedDatas: Map<string, string> = await ImageProcessing.resizeImageData(originalData, toVersions);
-            this.log.debug('createVersions() resizeImageData: ' + (Date.now() - startTime) + 'ms');
+            // this.log.debug('createVersions() resizeImageData: ' + (Date.now() - startTime) + 'ms');
 
             for (const version of toVersions) {
                 const versionCreateRequest: ImageDataCreateRequest = JSON.parse(JSON.stringify(originalImageData));

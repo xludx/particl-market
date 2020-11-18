@@ -71,6 +71,7 @@ export class EnvConfig {
         SMSG_MAX_MSG_BYTES: 24000,
 
         LOG_SMSGSEND: false,
+        LOG_RPC_INCOMING: false,
         LOG_RPC_CALL: false,
         LOG_MPMESSAGE: false
 };
@@ -105,7 +106,7 @@ export class EnvConfig {
             }
         });
 
-        if (!Environment.isTest()) {
+        if (Environment.isDevelopment()) {
             console.log('current env:');
             _.forOwn(process.env, (value: any, key: string) => {
                 if (!_.startsWith(key, 'npm_')) {

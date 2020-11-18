@@ -16,6 +16,8 @@ import { CreatableModel } from '../../../src/api/enums/CreatableModel';
 import { ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
 import { MPActionExtended } from '../../../src/api/enums/MPActionExtended';
 import { MPAction } from 'omp-lib/dist/interfaces/omp-enums';
+import { CommentCategory } from '../../../src/api/enums/CommentCategory';
+import { CommentAction } from '../../../src/api/enums/CommentAction';
 
 describe('NotificationSearchCommand', () => {
 
@@ -45,6 +47,8 @@ describe('NotificationSearchCommand', () => {
     let listingItemReceivedOnSellerNode: resources.ListingItem;
     let listingItemReceivedOnBuyerNode: resources.ListingItem;
     let randomCategory: resources.ItemCategory;
+    let notifications: resources.Notification[];
+    let imageCount: number;
 
     let sent = false;
     const PAGE = 0;
@@ -85,10 +89,50 @@ describe('NotificationSearchCommand', () => {
     });
 
 
+    test('Should fail because invalid types', async () => {
+        const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
+            PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            sellerProfile.id,
+            'INVALID_SHOULD_BE_ARRAY'
+        ]);
+        res.expectJson();
+        res.expectStatusCode(400);
+        expect(res.error.error.message).toBe(new InvalidParamException('types', 'ActionMessageTypes[]').getMessage());
+    });
+
+
+    test('Should fail because invalid category', async () => {
+        const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
+            PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            sellerProfile.id,
+            [CommentAction.MPA_COMMENT_ADD],
+            false
+        ]);
+        res.expectJson();
+        res.expectStatusCode(400);
+        expect(res.error.error.message).toBe(new InvalidParamException('category', 'string').getMessage());
+    });
+
+
+    test('Should fail because invalid category', async () => {
+        const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
+            PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            sellerProfile.id,
+            [CommentAction.MPA_COMMENT_ADD],
+            'INVALID'
+        ]);
+        res.expectJson();
+        res.expectStatusCode(400);
+        expect(res.error.error.message).toBe(new InvalidParamException('category', 'CommentCategory|ProposalCategory').getMessage());
+    });
+
+
     test('Should fail because invalid read', async () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
             sellerProfile.id,
+            [CommentAction.MPA_COMMENT_ADD],
+            CommentCategory.LISTINGITEM_QUESTION_AND_ANSWERS,
             'INVALID'
         ]);
         res.expectJson();
@@ -101,6 +145,8 @@ describe('NotificationSearchCommand', () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
             sellerProfile.id,
+            [CommentAction.MPA_COMMENT_ADD],
+            CommentCategory.LISTINGITEM_QUESTION_AND_ANSWERS,
             false
         ]);
         res.expectJson();
@@ -140,6 +186,7 @@ describe('NotificationSearchCommand', () => {
             generateListingItemTemplateParams   // what kind of data to generate
         ) as resources.ListingItemTemplate[];
         listingItemTemplateOnSellerNode = listingItemTemplates[0];
+        imageCount = listingItemTemplateOnSellerNode.ItemInformation.Images.length;
 
         expect(listingItemTemplateOnSellerNode).toBeDefined();
     });
@@ -300,9 +347,11 @@ describe('NotificationSearchCommand', () => {
     }, 600000); // timeout to 600s
 
 
-    test('Should return 3 Notifications', async () => {
+    test('Should return 2-3 Notifications', async () => {
         const res: any = await testUtilSellerNode.rpc(notificationCommand, [notificationSearchCommand,
             PAGE, PAGE_LIMIT, SEARCHORDER, NOTIFICATION_SEARCHORDERFIELD,
+            null,
+            [MPAction.MPA_LISTING_ADD, MPActionExtended.MPA_LISTING_IMAGE_ADD],
             null,
             false
         ]);
@@ -311,11 +360,13 @@ describe('NotificationSearchCommand', () => {
         const results: resources.Notification[] = res.getBody()['result'];
 
         log.debug('results: ', JSON.stringify(results, null, 2));
+        log.debug('imageCount: ', imageCount);
 
-        expect(results.length).toBe(3);
+        expect(results.length).toBe(imageCount + 1);
+
         expect(results[0].type).toBe(MPActionExtended.MPA_LISTING_IMAGE_ADD);
-        expect(results[1].type).toBe(MPActionExtended.MPA_LISTING_IMAGE_ADD);
-        expect(results[2].type).toBe(MPAction.MPA_LISTING_ADD);
+        expect(results[1].type).toBe(imageCount === 1 ? MPAction.MPA_LISTING_ADD : MPActionExtended.MPA_LISTING_IMAGE_ADD);
+        // expect(results[2].type).toBe(MPAction.MPA_LISTING_ADD);
     });
 
 });
