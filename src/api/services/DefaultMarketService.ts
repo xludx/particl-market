@@ -148,7 +148,7 @@ export class DefaultMarketService {
             })
             .then(value => value.toJSON());
 
-        this.log.debug('seedDefaultMarketForProfile(), defaultMarket: ', JSON.stringify(defaultMarket, null, 2));
+        this.log.debug('seedDefaultMarketForProfile(), defaultMarket: ', defaultMarket.id);
 
         return await this.marketService.findOne(defaultMarket.id, true).then(value => value.toJSON());
     }

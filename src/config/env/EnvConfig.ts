@@ -70,7 +70,9 @@ export class EnvConfig {
         SMSG_MAX_AMSG_BYTES: 512,
         SMSG_MAX_MSG_BYTES: 24000,
 
-        MPMESSAGE_DEBUG: false
+        LOG_SMSGSEND: false,
+        LOG_RPC_CALL: false,
+        LOG_MPMESSAGE: false
 };
 
     /**

@@ -924,7 +924,7 @@ export class CoreRpcService extends CtRpc {
      * @param logCall
      * @returns {Promise<any>}
      */
-    public async call(method: string, params: any[] = [], wallet?: string, logCall: boolean = true): Promise<any> {
+    public async call(method: string, params: any[] = [], wallet?: string, logCall: boolean = false): Promise<any> {
 
         const id = this.RPC_REQUEST_ID++;
         const postData = JSON.stringify({
@@ -937,9 +937,8 @@ export class CoreRpcService extends CtRpc {
         const url = this.getUrl(wallet);
         const options = this.getOptions();
 
-        if (logCall) {
-            // TODO: handle [object Object]
-            this.log.debug('call: ' + method + ' ' + JSON.stringify(params).replace(new RegExp(',', 'g'), ' '));
+        if (logCall || Environment.isTruthy(process.env.LOG_RPC_CALL)) {
+            this.log.debug('rpc call: ' + method + ' ' + JSON.stringify(params).replace(new RegExp(',', 'g'), ' '));
         }
 
         return await WebRequest.post(url, options, postData)

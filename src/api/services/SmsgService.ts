@@ -18,6 +18,7 @@ import { RpcWallet, RpcWalletInfo } from 'omp-lib/dist/interfaces/rpc';
 import { NotImplementedException } from '../exceptions/NotImplementedException';
 import {CoreMessageVersion} from '../enums/CoreMessageVersion';
 import {MessageVersions} from '../messages/MessageVersions';
+import {Environment} from '../../core/helpers/Environment';
 
 export interface SmsgGetInfo {
     enabled: boolean;
@@ -121,7 +122,8 @@ export class SmsgService {
                     return undefined;
                 });
 
-            this.log.debug('pushUnreadCoreSmsgMessages(), lastSmsgMessage: ', JSON.stringify(lastSmsgMessage, null, 2));
+            // this.log.debug('pushUnreadCoreSmsgMessages(), lastSmsgMessage: ', JSON.stringify(lastSmsgMessage, null, 2));
+
             if (_.isEmpty(lastSmsgMessage)) {
                 const earliestDate = 60 * 60 * 24 * parseInt(process.env.PAID_MESSAGE_RETENTION_DAYS, 10);
                 from = Math.trunc(Date.now() / 1000) - earliestDate;
@@ -139,11 +141,11 @@ export class SmsgService {
             timeto: to,                 // timeto, now
             unreadonly: true
         };
-        this.log.debug('pushUnreadCoreSmsgMessages(), pushOptions: ', JSON.stringify(pushOptions, null, 2));
+        // this.log.debug('pushUnreadCoreSmsgMessages(), pushOptions: ', JSON.stringify(pushOptions, null, 2));
 
         const result: SmsgZmqPushResult = await this.smsgZmqPush(pushOptions);
 
-        this.log.debug('requestUnreadCoreSmsgMessagesSinceShutdown(), numsent:', result.numsent);
+        // this.log.debug('requestUnreadCoreSmsgMessagesSinceShutdown(), numsent:', result.numsent);
         return result;
     }
 
@@ -291,7 +293,10 @@ export class SmsgService {
         // enable receiving messages on the sending address, just in case
         await this.smsgAddLocalAddress(fromAddress);
 
-        this.log.debug('smsgSend, from: ' + fromAddress + ', to: ' + toAddress + ', daysRetention: ' + daysRetention + ', estimateFee: ' + estimateFee);
+        if (Environment.isTruthy(process.env.LOG_SMSGSEND)) {
+            this.log.debug('smsgSend, from: ' + fromAddress + ', to: ' + toAddress + ', daysRetention: ' + daysRetention + ', estimateFee: ' + estimateFee);
+        }
+
         const params: any[] = [
             fromAddress,
             toAddress,
@@ -303,7 +308,10 @@ export class SmsgService {
             // coinControl
         ];
         const response: SmsgSendResponse = await this.coreRpcService.call('smsgsend', params, wallet);
-        this.log.debug('smsgSend, response: ' + JSON.stringify(response, null, 2));
+        if (Environment.isTruthy(process.env.LOG_SMSGSEND)) {
+            this.log.debug('smsgSend, response: ' + JSON.stringify(response, null, 2));
+        }
+
         if (response.error) {
             this.log.error('ERROR: ', JSON.stringify(response, null, 2));
             throw new MessageException(`Failed to send message: ${response.error}`);
@@ -420,7 +428,7 @@ export class SmsgService {
     public async smsgAddLocalAddress(address: string): Promise<boolean> {
         return await this.coreRpcService.call('smsgaddlocaladdress', [address])
             .then(response => {
-                this.log.debug('smsgAddLocalAddress, response: ' + JSON.stringify(response, null, 2));
+                // this.log.debug('smsgAddLocalAddress, response: ' + JSON.stringify(response, null, 2));
                 if (response.result === 'Receiving messages enabled for address.'
                     || (response.result === 'Address not added.' && response.reason === 'Key exists in database')) {
                     return true;
@@ -529,7 +537,7 @@ export class SmsgService {
     public async smsgZmqPush(options: SmsgZmqPushOptions): Promise<SmsgZmqPushResult> {
         return await this.coreRpcService.call('smsgzmqpush', [options])
             .then(response => {
-                this.log.debug('smsgZmqPush, response: ' + JSON.stringify(response, null, 2));
+                // this.log.debug('smsgZmqPush, response: ' + JSON.stringify(response, null, 2));
                 return response;
             });
     }

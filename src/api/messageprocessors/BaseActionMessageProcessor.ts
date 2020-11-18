@@ -78,7 +78,7 @@ export abstract class BaseActionMessageProcessor implements ActionMessageProcess
             return;
         }
 
-        // set process.env.MPMESSAGE_DEBUG=true to enable this
+        // set process.env.LOG_MPMESSAGE=true to enable this
         this.actionService.marketplaceMessageDebug(ActionDirection.INCOMING, event.marketplaceMessage.action);
 
         const validContent = await this.validator.validateMessage(event.marketplaceMessage, ActionDirection.INCOMING, event.smsgMessage)
