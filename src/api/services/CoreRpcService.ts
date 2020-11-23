@@ -250,9 +250,16 @@ export class CoreRpcService extends CtRpc {
      *
      * @param wallet
      * @param label
+     * @param path
      */
-    public async extKeyDeriveAccount(wallet: string, label: string): Promise<RpcExtKeyResult> {
-        return await this.call('extkey', ['deriveAccount', label], wallet);
+    public async extKeyDeriveAccount(wallet: string, label: string, path?: string): Promise<RpcExtKeyResult> {
+        const params: any[] = [];
+        params.push('deriveAccount');
+        params.push(label);
+        if (path) {
+            params.push(path);
+        }
+        return await this.call('extkey', params, wallet);
     }
 
     /**

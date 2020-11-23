@@ -18,6 +18,7 @@ import { IdentityService } from '../../services/model/IdentityService';
 import { Collection } from 'bookshelf';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
+
 export class IdentityListCommand extends BaseCommand implements RpcCommandInterface<Collection<Identity>> {
 
     constructor(
@@ -28,6 +29,7 @@ export class IdentityListCommand extends BaseCommand implements RpcCommandInterf
         super(Commands.IDENTITY_LIST);
         this.log = new Logger(__filename);
     }
+
     public getCommandParamValidationRules(): CommandParamValidationRules {
         return {
             params: [
@@ -35,7 +37,6 @@ export class IdentityListCommand extends BaseCommand implements RpcCommandInterf
             ] as ParamValidationRule[]
         } as CommandParamValidationRules;
     }
-
 
     /**
      * command description
