@@ -133,7 +133,7 @@ export class DefaultMarketService {
                 // if theres no default Market yet, create it and set it as default
                 // first create the Market Identity
                 const marketName = 'particl-market';
-                const marketIdentity: resources.Identity = await this.identityService.createMarketIdentityForProfile(profile, marketName)
+                const marketIdentity: resources.Identity = await this.identityService.createMarketIdentityForProfile(profile, marketName, true)
                     .then(value => value.toJSON());
 
                 // this.log.debug('seedDefaultMarketForProfile(), marketIdentity: ', JSON.stringify(marketIdentity, null, 2));

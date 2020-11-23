@@ -5,18 +5,13 @@
 import * from 'jest';
 import * as resources from 'resources';
 import { BlackBoxTestUtil } from '../lib/BlackBoxTestUtil';
-import { CreatableModel } from '../../../src/api/enums/CreatableModel';
 import { Commands } from '../../../src/api/commands/CommandEnumType';
-import { ImageProcessing } from '../../../src/core/helpers/ImageProcessing';
-import { GenerateListingItemTemplateParams } from '../../../src/api/requests/testdata/GenerateListingItemTemplateParams';
-import { ListingItemTemplate } from '../../../src/api/models/ListingItemTemplate';
 import { Logger as LoggerType } from '../../../src/core/Logger';
-import { ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
-import { ModelNotModifiableException } from '../../../src/api/exceptions/ModelNotModifiableException';
 import { MissingParamException } from '../../../src/api/exceptions/MissingParamException';
 import { ModelNotFoundException } from '../../../src/api/exceptions/ModelNotFoundException';
 import { InvalidParamException } from '../../../src/api/exceptions/InvalidParamException';
 import { MessageException } from '../../../src/api/exceptions/MessageException';
+import { IdentityType } from '../../../src/api/enums/IdentityType';
 
 
 describe('IdentityAddCommand', () => {
@@ -30,10 +25,13 @@ describe('IdentityAddCommand', () => {
 
     const identityCommand = Commands.IDENTITY_ROOT.commandName;
     const identityAddCommand = Commands.IDENTITY_ADD.commandName;
+    const identityListCommand = Commands.IDENTITY_LIST.commandName;
 
     let profile: resources.Profile;
     let market: resources.Market;
 
+    let identities: resources.Identity[];
+    let identity: resources.Identity;
 
     beforeAll(async () => {
         await testUtil.cleanDb();
@@ -43,6 +41,26 @@ describe('IdentityAddCommand', () => {
         market = await testUtil.getDefaultMarket(profile.id);
         expect(market.id).toBeDefined();
 
+    });
+
+
+    test('Should have 2 Identities by default, PROFILE and MARKET', async () => {
+        const res: any = await testUtil.rpc(identityCommand, [identityListCommand,
+            profile.id
+        ]);
+        res.expectJson();
+        res.expectStatusCode(200);
+
+        const results: resources.Identity[] = res.getBody()['result'];
+
+        expect(results).toHaveLength(2);
+        expect(results[0].type).toBe(IdentityType.PROFILE);
+        expect(results[1].type).toBe(IdentityType.MARKET);
+        expect(results[1].Markets).toHaveLength(1);
+        expect(results[1].Markets[0].publishAddress).toBe(market.publishAddress);
+        expect(results[1].Profile.id).toBe(profile.id);
+
+        identities = results;
     });
 
 
@@ -114,8 +132,29 @@ describe('IdentityAddCommand', () => {
         res.expectJson();
         res.expectStatusCode(200);
         const result: resources.Identity = res.getBody()['result'];
-
         expect(result.name).toBe('name');
+        expect(result.address).not.toBe(identities[1].address);
+
+        identity = result;
     });
+
+
+    test('Should list all 3 Identities', async () => {
+        const res: any = await testUtil.rpc(identityCommand, [identityListCommand,
+            profile.id
+        ]);
+        res.expectJson();
+        res.expectStatusCode(200);
+
+        const results: resources.Identity[] = res.getBody()['result'];
+        log.debug('results:', JSON.stringify(results, null, 2));
+        expect(results).toHaveLength(3);
+        expect(results[1].address).not.toBe(identity.address);
+        expect(results[2].address).toBe(identity.address);
+
+        log.debug('results[1].address:', results[1].address);
+        log.debug('results[2].address:', results[2].address);
+    });
+
 
 });
