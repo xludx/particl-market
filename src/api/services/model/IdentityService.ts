@@ -24,7 +24,6 @@ import { CoreRpcService } from '../CoreRpcService';
 import { SmsgService } from '../SmsgService';
 import { ShoppingCartCreateRequest } from '../../requests/model/ShoppingCartCreateRequest';
 import { ShoppingCartService } from './ShoppingCartService';
-import { MarketService } from './MarketService';
 
 
 export class IdentityService {
@@ -209,10 +208,7 @@ export class IdentityService {
      * @param useMnemonicFromEnv
      */
     public async createProfileIdentity(profile: resources.Profile, useMnemonicFromEnv: boolean = false): Promise<Identity> {
-
         this.log.debug('createProfileIdentity(), creating new Profile Identity: ' + profile.name);
-
-        // create and load a new blank wallet
         const walletName = path.join('profiles', profile.name);
 
         let mnemonic: RpcMnemonic | undefined;
@@ -220,6 +216,7 @@ export class IdentityService {
 
         await this.createOrLoadWalletAndReturnCreated(walletName)
             .then(async created => {
+
                 // listwalletdir
                 // createwallet
                 // loadwallet

@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:12.18.2
+FROM mhart/alpine-node:12.19
 # 10.16.3
 # 9.6.1
 
