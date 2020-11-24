@@ -123,16 +123,16 @@ export class ProposalResultRecalcService extends BaseObserverService {
                     if (shouldRemove) {
 
                         // check if blacklist exists
-                        const type = ProposalCategory.ITEM_VOTE
+                        const blacklistType = flaggedItem.Proposal.category === ProposalCategory.ITEM_VOTE
                             ? BlacklistType.LISTINGITEM
-                            : ProposalCategory.MARKET_VOTE
+                            : flaggedItem.Proposal.category === ProposalCategory.MARKET_VOTE
                                 ? BlacklistType.MARKET
                                 : undefined;
                         const target = flaggedItem.Proposal.target;
                         const market = flaggedItem.Proposal.market;
 
                         const found: resources.Blacklist[] = await this.blacklistService.search({
-                            type,
+                            type: blacklistType,
                             targets: [target],
                             market
                         } as BlacklistSearchParams).then(valueBL => valueBL.toJSON());
@@ -140,7 +140,7 @@ export class ProposalResultRecalcService extends BaseObserverService {
                         if (found.length === 0) {
                             // nothing found -> create
                             blacklist = await this.blacklistService.create({
-                                type,
+                                type: blacklistType,
                                 target,
                                 market
                             } as BlacklistCreateRequest).then(bl => bl.toJSON());

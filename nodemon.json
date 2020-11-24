@@ -1,5 +1,6 @@
 {
     "delay": "0",
+    "legacyWatch": true,
     "execMap": {
         "ts": "ts-node"
     },
