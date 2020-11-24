@@ -59,9 +59,9 @@ export class DefaultProfileService {
                     return identity.type === IdentityType.PROFILE;
                 });
 
-                if (_.isEmpty(profileIdentity)) {
+                if (!profileIdentity) {
                     // no Profile Identity was found -> create
-                    await this.identityService.createProfileIdentity(profile).then(value => value.toJSON());
+                    await this.identityService.createProfileIdentity(profile, true).then(value => value.toJSON());
                 }
 
             } else {
@@ -73,7 +73,7 @@ export class DefaultProfileService {
                 } as ProfileCreateRequest).then(value => value.toJSON());
 
                 // create Identity for default Profile
-                await this.identityService.createProfileIdentity(profile).then(value => value.toJSON());
+                await this.identityService.createProfileIdentity(profile, true).then(value => value.toJSON());
             }
 
             // create or update the default profile Setting
@@ -91,7 +91,7 @@ export class DefaultProfileService {
      */
     public async upgradeDefaultProfile(): Promise<resources.Profile> {
         const profile: resources.Profile = await this.getDefault();
-        await this.identityService.createProfileIdentity(profile);
+        await this.identityService.createProfileIdentity(profile, true);
         return await this.getDefault();
     }
 

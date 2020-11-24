@@ -10,9 +10,7 @@ import {IdentityType} from '../../enums/IdentityType';
 // tslint:disable:variable-name
 export class IdentityUpdateRequest extends RequestBody implements ModelRequestInterface {
 
-    @IsNotEmpty()
     public wallet: string;
-
     public address: string;
     public hdseedid: string;
     public path: string;
