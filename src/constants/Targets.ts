@@ -353,6 +353,7 @@ export const Targets = {
             ProfileListCommand: 'ProfileListCommand',
             ProfileRemoveCommand: 'ProfileRemoveCommand',
             ProfileRootCommand: 'ProfileRootCommand',
+            ProfileMnemonicCommand: 'ProfileMnemonicCommand',
             ProfileUpdateCommand: 'ProfileUpdateCommand'
         },
         proposal: {

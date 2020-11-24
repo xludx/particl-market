@@ -104,6 +104,7 @@ import { ProfileRemoveCommand } from '../commands/profile/ProfileRemoveCommand';
 import { ProfileUpdateCommand } from '../commands/profile/ProfileUpdateCommand';
 import { ProfileGetCommand } from '../commands/profile/ProfileGetCommand';
 import { ProfileListCommand } from '../commands/profile/ProfileListCommand';
+import { ProfileMnemonicCommand } from '../commands/profile/ProfileMnemonicCommand';
 import { ProfileRootCommand } from '../commands/profile/ProfileRootCommand';
 import { ShippingDestinationRootCommand } from '../commands/shippingdestination/ShippingDestinationRootCommand';
 import { ShippingDestinationListCommand } from '../commands/shippingdestination/ShippingDestinationListCommand';
@@ -271,6 +272,7 @@ export class RpcCommandFactory {
         @inject(Types.Command) @named(Targets.Command.profile.ProfileGetCommand) private profileGetCommand: ProfileGetCommand,
         @inject(Types.Command) @named(Targets.Command.profile.ProfileUpdateCommand) private profileUpdateCommand: ProfileUpdateCommand,
         @inject(Types.Command) @named(Targets.Command.profile.ProfileListCommand) private profileListCommand: ProfileListCommand,
+        @inject(Types.Command) @named(Targets.Command.profile.ProfileMnemonicCommand) private profileMnemonicCommand: ProfileMnemonicCommand,
         @inject(Types.Command) @named(Targets.Command.profile.ProfileRootCommand) private profileRootCommand: ProfileRootCommand,
 
         @inject(Types.Command) @named(Targets.Command.shippingdestination.ShippingDestinationListCommand) private shippingDestinationListCommand: ShippingDestinationListCommand,
@@ -454,6 +456,7 @@ export class RpcCommandFactory {
         this.commands.push(profileGetCommand);
         this.commands.push(profileUpdateCommand);
         this.commands.push(profileListCommand);
+        this.commands.push(profileMnemonicCommand);
         this.commands.push(profileRootCommand);
 
         this.commands.push(shippingDestinationRootCommand);

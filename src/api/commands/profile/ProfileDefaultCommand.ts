@@ -14,10 +14,9 @@ import { Profile } from '../../models/Profile';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { DefaultSettingService } from '../../services/DefaultSettingService';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
+
 
 export class ProfileDefaultCommand extends BaseCommand implements RpcCommandInterface<Profile> {
 

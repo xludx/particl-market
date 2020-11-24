@@ -71,8 +71,8 @@ export class ProfileGetCommand extends BaseCommand implements RpcCommandInterfac
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <id>              - [optional] Numeric - The ID of the Profile. \n'
-            + '    <name>            - [optional] String - The name of the Profile. ';
+            + '    <id>              - [optional] number, The Id of the Profile. \n'
+            + '    <name>            - [optional] string, The name of the Profile. ';
     }
 
     public description(): string {

@@ -204,7 +204,7 @@ export class ServerStartedListener implements interfaces.Listener {
             throw new MessageException('Missing default Market configuration.');
         }
 
-        this.log.debug('bootstrap(), done.');
+        this.log.info('bootstrap(), done.');
 
         return true;
     }

@@ -67,3 +67,6 @@ codeship*.yml
 
 kontena.ovpn
 
+.env.docker-compose.app1
+.env.docker-compose.app2
+

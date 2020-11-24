@@ -113,7 +113,7 @@ export class CoreRpcService extends CtRpc {
     }
 
     /**
-     *
+     * create will also automatically load the wallet
      * @param name
      * @param disablePrivateKeys
      * @param blank
@@ -214,10 +214,11 @@ export class CoreRpcService extends CtRpc {
      * @param wallet
      * @param key
      * @param label
+     * @param bip44
      * @param saveBip44Key
      */
-    public async extKeyImport(wallet: string, key: string, label: string, saveBip44Key: boolean = true): Promise<RpcExtKeyResult> {
-        return await this.call('extkey', ['import', key, label, saveBip44Key], wallet);
+    public async extKeyImport(wallet: string, key: string, label: string, bip44: boolean = true, saveBip44Key: boolean = true): Promise<RpcExtKeyResult> {
+        return await this.call('extkey', ['import', key, label, bip44, saveBip44Key], wallet);
     }
 
     /**

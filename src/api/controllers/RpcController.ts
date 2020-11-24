@@ -15,7 +15,7 @@ import { RpcCommandFactory } from '../factories/RpcCommandFactory';
 import { RpcRequest } from '../requests/RpcRequest';
 import { Commands} from '../commands/CommandEnumType';
 import { RpcCommandInterface } from '../commands/RpcCommandInterface';
-import {Environment} from '../../core/helpers/Environment';
+import { Environment } from '../../core/helpers/Environment';
 
 // Get middlewares
 const rpc = app.IoC.getNamed<interfaces.Middleware>(Types.Middleware, Targets.Middleware.RpcMiddleware);
