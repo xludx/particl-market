@@ -51,7 +51,7 @@ export class Notification extends Bookshelf.Model<Notification> {
                 }
 
                 if (!_.isEmpty(options.types)) {
-                    qb.whereIn('type', options.types as ActionMessageTypes[]);
+                    qb.whereIn('type', options.types);
                 }
 
                 if (!_.isEmpty(options.category)) {
