@@ -161,10 +161,10 @@ export class MarketService {
         await this.marketRepo.destroy(id);
     }
 
-    public async joinMarket(market: resources.Market): Promise<void> {
+    public async joinMarket(market: resources.Market, rescan: boolean = false): Promise<void> {
         await this.coreRpcService.loadWallet(market.Identity.wallet);
         await this.smsgService.smsgSetWallet(market.Identity.wallet);
-        await this.importMarketKeys(market);
+        await this.importMarketKeys(market, rescan);
         return;
     }
 
@@ -187,8 +187,9 @@ export class MarketService {
      * type === STOREFRONT_ADMIN -> receive + publish keys are different
      *
      * @param market
+     * @param rescan
      */
-    public async importMarketKeys(market: resources.Market): Promise<void> {
+    public async importMarketKeys(market: resources.Market, rescan: boolean = false): Promise<void> {
 
         // receiveKey
         await this.smsgService.smsgImportPrivKey(market.receiveKey, market.name);                   // add private key to the smsg database
@@ -212,6 +213,9 @@ export class MarketService {
             await this.smsgService.smsgAddLocalAddress(market.publishAddress);                      // enable receiving messages on address.
         }
 
+        if (rescan) {
+            await this.smsgService.smsgScanBuckets();
+        }
         this.log.debug('Market keys imported.');
     }
 

@@ -16,9 +16,13 @@ import { SmsgSendParams } from '../requests/action/SmsgSendParams';
 import { SmsgMessageService } from './model/SmsgMessageService';
 import { RpcWallet, RpcWalletInfo } from 'omp-lib/dist/interfaces/rpc';
 import { NotImplementedException } from '../exceptions/NotImplementedException';
-import {CoreMessageVersion} from '../enums/CoreMessageVersion';
-import {MessageVersions} from '../messages/MessageVersions';
-import {Environment} from '../../core/helpers/Environment';
+import { CoreMessageVersion } from '../enums/CoreMessageVersion';
+import { MessageVersions } from '../messages/MessageVersions';
+import { Environment } from '../../core/helpers/Environment';
+
+export interface SmsgResult {
+    result: string;
+}
 
 export interface SmsgGetInfo {
     enabled: boolean;
@@ -36,9 +40,8 @@ export interface SmsgInboxOptions {
     encoding?: string;          // Display message data in encoding, values: "text", "hex", "none". default=text.
 }
 
-export interface CoreSmsgMessageResult {
+export interface CoreSmsgMessageResult extends SmsgResult {
     messages: CoreSmsgMessage[];
-    result: string;             // amount
 }
 
 export interface SmsgZmqPushOptions {
@@ -542,4 +545,7 @@ export class SmsgService {
             });
     }
 
+    public async smsgScanBuckets(): Promise<SmsgResult> {
+        return await this.coreRpcService.call('smsgscanbuckets', []);
+    }
 }
