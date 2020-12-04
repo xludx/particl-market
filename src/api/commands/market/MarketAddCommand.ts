@@ -115,7 +115,8 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
                 new StringValidationRule('description', false),
                 new EnumValidationRule('region', false, 'MarketRegion',
                     EnumHelper.getValues(MarketRegion) as string[], MarketRegion.WORLDWIDE),
-                new BooleanValidationRule('skipJoin', false, false)
+                new BooleanValidationRule('skipJoin', false, false),
+                new BooleanValidationRule('rescan', false, false)
             ] as ParamValidationRule[]
         } as CommandParamValidationRules;
     }
@@ -146,6 +147,7 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
         const description: string = data.params[6];
         const region: string = data.params[7];
         const skipJoin: boolean = data.params[8];
+        const rescan: boolean = data.params[9];
 
         // create market identity if one wasn't given
         if (_.isNil(identity) && !skipJoin) {
@@ -196,7 +198,7 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
             const market: resources.Market = value.toJSON();
 
             if (!skipJoin && !_.isNil(market.Identity.id) && !_.isNil(market.Identity.Profile.id)) {
-                await this.marketService.joinMarket(market);
+                await this.marketService.joinMarket(market, rescan);
             }
 
             // create root category for market
@@ -216,8 +218,9 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
      *                             if type === STOREFRONT_ADMIN -> private key in wif format
      *  [5]: identityId, optional
      *  [6]: description, optional
-     *  [7]: region, optional
-     *  [8]: skipJoin, optional
+     *  [7]: region, optional, default: MarketRegion.WORLDWIDE
+     *  [8]: skipJoin, optional, default: false
+     *  [9]: rescan, optional, default: false
      *
      * @param {RpcRequest} data
      * @returns {Promise<RpcRequest>}
@@ -234,6 +237,7 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
         const description = data.params[6];
         const region = data.params[7];
         const skipJoin = data.params[8];
+        const rescan = data.params[9];
 
         await this.checkForDuplicateMarketName(profile.id, name);
 
@@ -259,12 +263,13 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
         data.params[6] = description;
         data.params[7] = region;
         data.params[8] = skipJoin;
+        data.params[9] = rescan;
 
         return data;
     }
 
     public usage(): string {
-        return this.getName() + ' <profileId> <name> [type] [receiveKey] [publishKey] [identityId] [description] [region] [skipJoin]';
+        return this.getName() + ' <profileId> <name> [type] [receiveKey] [publishKey] [identityId] [description] [region] [skipJoin] [rescan]';
     }
 
     public help(): string {
@@ -277,7 +282,8 @@ export class MarketAddCommand extends BaseCommand implements RpcCommandInterface
             + '    <identityId>             - [optional], number, The identity to be used with the Market. \n'
             + '    <description>            - [optional], string, Market description. \n'
             + '    <region>                 - [optional], string, Market region. \n'
-            + '    <skipJoin>               - [optional], string, skip Market join. \n';
+            + '    <skipJoin>               - [optional], boolean, skip Market join. \n'
+            + '    <rescan>                 - [optional], boolean, rescan smsgbuckets. \n';
     }
 
     public description(): string {

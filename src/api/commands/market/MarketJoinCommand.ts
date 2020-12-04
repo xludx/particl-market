@@ -24,7 +24,7 @@ import { MarketAddMessage } from '../../messages/action/MarketAddMessage';
 import { MarketCreateParams } from '../../factories/ModelCreateParams';
 import { MarketFactory } from '../../factories/model/MarketFactory';
 import { ContentReference, DSN, ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
-import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
+import {BooleanValidationRule, CommandParamValidationRules, IdValidationRule, ParamValidationRule} from '../CommandParamValidation';
 import {ImageVersions} from '../../../core/helpers/ImageVersionEnumType';
 
 
@@ -48,7 +48,8 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
             params: [
                 new IdValidationRule('profileId', true, this.profileService),
                 new IdValidationRule('marketId', true, this.marketService),
-                new IdValidationRule('identityId', false, this.identityService)
+                new IdValidationRule('identityId', false, this.identityService),
+                new BooleanValidationRule('rescan', false, false)
             ] as ParamValidationRule[]
         } as CommandParamValidationRules;
     }
@@ -58,6 +59,7 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
      *  [0]: profile: resources.Profile
      *  [1]: market: resources.Market
      *  [2]: identity: resources.Identity, optional
+     *  [3]: rescan, optional, default: false
      *
      * @param data
      * @returns {Promise<Market>}
@@ -67,6 +69,7 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
         const profile: resources.Profile = data.params[0];
         const marketToJoin: resources.Market = data.params[1];
         let identity: resources.Identity = data.params[2];
+        const rescan: boolean = data.params[3];
 
         this.log.debug('marketToJoin: ', JSON.stringify(marketToJoin, null, 2));
 
@@ -107,7 +110,7 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
             this.log.debug('market: ', JSON.stringify(market, null, 2));
 
             if (!_.isNil(market.Identity.id) && !_.isNil(market.Identity.Profile.id)) {
-                await this.marketService.joinMarket(market);
+                await this.marketService.joinMarket(market, rescan);
             }
 
             // create root category for market
@@ -122,6 +125,7 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
      *  [0]: profileId
      *  [1]: marketId
      *  [2]: identityId, optional
+     *  [3]: rescan, optional, default: false
      *
      * @param {RpcRequest} data
      * @returns {Promise<RpcRequest>}
@@ -132,6 +136,7 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
         const profile: resources.Profile = data.params[0];
         const market: resources.Market = data.params[1];
         const identity: resources.Identity = data.params[2];
+        const rescan = data.params[3];
 
         // make sure Identity belongs to the given Profile
         if (!_.isNil(identity) && identity.Profile.id !== profile.id) {
@@ -153,19 +158,21 @@ export class MarketJoinCommand extends BaseCommand implements RpcCommandInterfac
         data.params[0] = profile;
         data.params[1] = market;
         data.params[2] = identity;
+        data.params[3] = rescan;
 
         return data;
     }
 
     public usage(): string {
-        return this.getName() + ' <profileId> <marketId> [identityId]';
+        return this.getName() + ' <profileId> <marketId> [identityId] [rescan]';
     }
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
             + '    <profileId>              - number - The ID of the Profile joining the Market. \n'
             + '    <marketId>               - number - The ID of the Market being joined. \n'
-            + '    <identityId>             - [optional] number, The Identity to be used with the Market. \n';
+            + '    <identityId>             - [optional] number, The Identity to be used with the Market. \n'
+            + '    <rescan>                 - [optional], boolean, rescan smsgbuckets. \n';
     }
 
     public description(): string {
