@@ -23,4 +23,4 @@ COPY yarn.lock /app
 #CMD [ "yarn", "serve" ]
 #CMD [ "bin/entrypoint.sh" ]
 
-EXPOSE 3000 3100 3200
+EXPOSE 45492 45592 45692

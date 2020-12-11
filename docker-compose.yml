@@ -24,7 +24,8 @@ services:
 #        source: ../particl-market-data/app1_node_modules/
 #        target: /app/node_modules
     ports:
-      - 3100:3100
+      - 3100:45492
+
     command: bin/entrypoint.sh
     links:
       - particld1
@@ -34,7 +35,7 @@ services:
       - .env.docker-compose.app1
     environment:
       - NODE_ENV=development
-      - APP_PORT=3100
+      - APP_PORT=45592
       - RPCUSER=test
       - RPCPASSWORD=test
       - RPCHOSTNAME=particld1
@@ -65,7 +66,7 @@ services:
 #        target: /app/node_modules
 
     ports:
-      - 3200:3200
+      - 3200:45692
     command: bin/entrypoint.sh
     links:
       - particld2
@@ -75,7 +76,7 @@ services:
       - .env.docker-compose.app2
     environment:
       - NODE_ENV=development
-      - APP_PORT=3200
+      - APP_PORT=45692
       - RPCUSER=test
       - RPCPASSWORD=test
       - RPCHOSTNAME=particld2

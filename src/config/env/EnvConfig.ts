@@ -18,7 +18,7 @@ export class EnvConfig {
         APP_NAME: 'particl-market',
         APP_HOST: 'http://localhost',
         APP_URL_PREFIX: '/api',
-        APP_PORT: 3000,
+        APP_PORT: 45492,
         RPCHOSTNAME: 'localhost',
         RPCCOOKIEFILE: '.cookie',
         MAINNET_PORT: 51738,
