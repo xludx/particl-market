@@ -209,7 +209,7 @@ export class SmsgService {
     }
 
     /**
-     * ﻿Adds a private key (as returned by dumpprivkey) to the smsg database.
+     * Adds a private key (as returned by dumpprivkey) to the smsg database.
      * The imported key can receive messages even if the wallet is locked.
      *
      * Arguments:
@@ -234,7 +234,7 @@ export class SmsgService {
      * Decrypt and display all received messages.
      * Warning: clear will delete all messages.
      *
-     * ﻿smsginbox [all|unread|clear] filter options
+     * smsginbox [all|unread|clear] filter options
      *
      * @param wallet
      * @param {string} mode
@@ -257,7 +257,7 @@ export class SmsgService {
     }
 
     /**
-     * ﻿Send an encrypted message from address to another
+     * Send an encrypted message from address to another
      *
      * response:
      * {
@@ -324,10 +324,10 @@ export class SmsgService {
 
     /**
      * List and manage keys.
-     * ﻿﻿[whitelist|all|wallet|recv <+/-> <address>|anon <+/-> <address>]
+     * [whitelist|all|wallet|recv <+/-> <address>|anon <+/-> <address>]
      *
      * response:
-     * ﻿{
+     * {
      * "wallet_keys": [
      * ],
      * "smsg_keys": [

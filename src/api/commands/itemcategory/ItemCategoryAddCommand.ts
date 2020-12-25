@@ -21,7 +21,6 @@ import { MessageException } from '../../exceptions/MessageException';
 import { ItemCategoryFactory } from '../../factories/model/ItemCategoryFactory';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule, StringValidationRule } from '../CommandParamValidation';
 
-
 export class ItemCategoryAddCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
 
     constructor(
@@ -114,7 +113,7 @@ export class ItemCategoryAddCommand extends BaseCommand implements RpcCommandInt
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <marketId>                    - number - Market ID. '
+            + '    <marketId>                    - number - Market ID. \n'
             + '    <categoryName>                - String - The name of the category to create. \n'
             + '    <description>                 - String - A description of the category to create. \n'
             + '    <parentItemCategoryId>        - Numeric - The ID of the parent category of the category we\'re creating. \n';

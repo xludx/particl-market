@@ -14,8 +14,6 @@ import { Commands } from '../CommandEnumType';
 
 export class ItemLocationRootCommand extends BaseCommand implements RpcCommandInterface<void> {
 
-    public log: LoggerType;
-
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
     ) {

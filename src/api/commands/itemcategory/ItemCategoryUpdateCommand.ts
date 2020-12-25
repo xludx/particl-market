@@ -16,19 +16,19 @@ import { ItemCategory } from '../../models/ItemCategory';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands } from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { MessageException } from '../../exceptions/MessageException';
 import { MarketService } from '../../services/model/MarketService';
 import { MarketType } from '../../enums/MarketType';
 import { hash } from 'omp-lib/dist/hasher/hash';
 import { ItemCategoryFactory } from '../../factories/model/ItemCategoryFactory';
-
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule,
+    StringValidationRule
+} from '../CommandParamValidation';
 
 export class ItemCategoryUpdateCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
-
-    public log: LoggerType;
-    public name: string;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -42,17 +42,23 @@ export class ItemCategoryUpdateCommand extends BaseCommand implements RpcCommand
     }
 
     /**
-     * updates user defined category
-     *
-     * data.params[]:
-     *  [0]: category: resources.ItemCategory
+     * params[]:
+     *  [0]: categoryId
      *  [1]: categoryName
      *  [2]: description
-     *  [3]: parentItemCategory: resources.ItemCategory
-     *
-     * @param data
-     * @returns {Promise<ItemCategory>}
+     *  [3]: parentCategoryId, default: root
      */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('categoryId', true, this.itemCategoryService),
+                new StringValidationRule('categoryName', true),
+                new StringValidationRule('description', true),
+                new IdValidationRule('parentItemCategoryId', false, this.itemCategoryService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<ItemCategory> {
 
@@ -63,7 +69,6 @@ export class ItemCategoryUpdateCommand extends BaseCommand implements RpcCommand
 
         let path: string[] = this.itemCategoryFactory.getArray(parentItemCategory);
         path = [...path, name];
-        this.log.debug('path: ', JSON.stringify(path, null, 2));
 
         return await this.itemCategoryService.update(category.id, {
             name,
@@ -85,32 +90,14 @@ export class ItemCategoryUpdateCommand extends BaseCommand implements RpcCommand
      * @returns {Promise<void>}
      */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
+        await super.validate(data);
 
-        if (data.params.length < 1) {
-            throw new MissingParamException('categoryId');
-        } else if (data.params.length < 2) {
-            throw new MissingParamException('categoryName');
-        } else if (data.params.length < 3) {
-            throw new MissingParamException('description');
-        }
+        const itemCategory: resources.ItemCategory = data.params[0];                // required
+        const categoryName = data.params[1];                                        // required
+        const description = data.params[2];                                         // required
+        const parentItemCategory: resources.ItemCategory = data.params[3];
 
-        if (typeof data.params[0] !== 'number' || data.params[0] <= 0) {
-            throw new InvalidParamException('categoryId', 'number');
-        } else if (typeof data.params[1] !== 'string') {
-            throw new InvalidParamException('categoryName', 'string');
-        } else if (typeof data.params[2] !== 'string') {
-            throw new InvalidParamException('description', 'string');
-        }
-
-        const itemCategory: resources.ItemCategory = await this.itemCategoryService.findOne(data.params[0]).then(value => value.toJSON());
-        data.params[0] = itemCategory;
-
-        if (data.params.length > 3) {
-            if (typeof data.params[3] !== 'number' || data.params[3] <= 0) {
-                throw new InvalidParamException('parentCategoryId', 'number');
-            }
-            data.params[3] = await this.itemCategoryService.findOne(data.params[3]).then(value => value.toJSON());
-        } else {
+        if (!parentItemCategory) {
             // if parent wasnt given, use the root
             data.params[3] = await this.itemCategoryService.findRoot(itemCategory.market).then(value => value.toJSON());
         }
@@ -140,10 +127,10 @@ export class ItemCategoryUpdateCommand extends BaseCommand implements RpcCommand
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <categoryId>                  - Numeric - The ID of the ItemCategory. \n'
-            + '    <categoryName>                - String - The new name for the ItemCategory. \n'
-            + '    <description>                 - String - The new description for the ItemCategory. \n'
-            + '    <parentItemCategoryId>        - [optional] Numeric - The ID of the new parent ItemCategory; default is the market root category. ';
+            + '    <categoryId>                  - number, The ID of the ItemCategory. \n'
+            + '    <categoryName>                - string, The new name for the ItemCategory. \n'
+            + '    <description>                 - string, The new description for the ItemCategory. \n'
+            + '    <parentItemCategoryId>        - [optional] number - The ID of the new parent ItemCategory; default is the market root category. ';
     }
 
     public description(): string {

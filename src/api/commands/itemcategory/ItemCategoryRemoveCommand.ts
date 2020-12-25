@@ -19,14 +19,10 @@ import { Commands } from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
 import { SearchOrder } from '../../enums/SearchOrder';
 import { ListingItemSearchParams } from '../../requests/search/ListingItemSearchParams';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { ListingItemTemplateSearchOrderField } from '../../enums/SearchOrderField';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
 export class ItemCategoryRemoveCommand extends BaseCommand implements RpcCommandInterface<void> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -38,51 +34,28 @@ export class ItemCategoryRemoveCommand extends BaseCommand implements RpcCommand
         this.log = new Logger(__filename);
     }
 
-    /**
-     * remove user defined category
-     * data.params[]:
-     *  [0]: itemCategory: resources.ItemCategory
-     *
-     * @param data
-     * @returns {Promise<void>}
-     */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('id', true, this.itemCategoryService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<void> {
         const category: resources.ItemCategory = data.params[0];
         return await this.itemCategoryService.destroy(category.id);
     }
 
-    /**
-     * data.params[]:
-     *  [0]: categoryId
-     *
-     * @param data
-     * @returns {Promise<void>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
+        await super.validate(data);
 
-        if (data.params.length < 1) {
-            throw new MissingParamException('categoryId');
+        const category: resources.ItemCategory = data.params[0];
+
+        if (_.isNil(category.market)) {
+            throw new MessageException('Default ItemCategory cannot be removed.');
         }
-
-        if (typeof data.params[0] !== 'number') {
-            throw new InvalidParamException('categoryId', 'number');
-        }
-        const categoryId = data.params[0];
-
-        const itemCategory: resources.ItemCategory = await this.itemCategoryService.findOne(categoryId)
-            .catch(reason => {
-                throw new ModelNotFoundException('ItemCategory');
-            })
-            .then(value => {
-                const category = value.toJSON();
-                if (_.isNil(category.market)) {
-                    throw new MessageException('Default ItemCategory cannot be removed.');
-                }
-                return category;
-            });
-
-        data.params[0] = itemCategory;
 
         // check for listingItemTemplates related to category
         await this.listingItemTemplateService.search({
@@ -90,7 +63,7 @@ export class ItemCategoryRemoveCommand extends BaseCommand implements RpcCommand
             pageLimit: 10,
             order: SearchOrder.ASC,
             orderField: ListingItemTemplateSearchOrderField.UPDATED_AT,
-            categories: [categoryId]
+            categories: [category.id]
         } as ListingItemTemplateSearchParams)
             .then(values => {
                 const listingItemTemplates = values.toJSON();
@@ -101,7 +74,7 @@ export class ItemCategoryRemoveCommand extends BaseCommand implements RpcCommand
 
         // check for listingItems related to category
         await this.listingItemService.search({
-            categories: [categoryId]
+            categories: [category.id]
         } as ListingItemSearchParams)
             .then(values => {
                 const listingItems = values.toJSON();
@@ -119,7 +92,7 @@ export class ItemCategoryRemoveCommand extends BaseCommand implements RpcCommand
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <categoryId>                  - Numeric - The ID belonging to the category we want to destroy. ';
+            + '    <categoryId>                  - number - ItemCategory ID. \n';
     }
 
     public description(): string {

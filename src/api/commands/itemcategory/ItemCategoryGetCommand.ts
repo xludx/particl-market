@@ -9,17 +9,12 @@ import { validate, request } from '../../../core/api/Validate';
 import { Types, Core, Targets } from '../../../constants';
 import { ItemCategoryService } from '../../services/model/ItemCategoryService';
 import { RpcRequest } from '../../requests/RpcRequest';
-import { ItemCategory } from '../../models/ItemCategory';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
-export class ItemCategoryGetCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
-
-    public log: LoggerType;
+export class ItemCategoryGetCommand extends BaseCommand implements RpcCommandInterface<resources.ItemCategory> {
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -30,36 +25,25 @@ export class ItemCategoryGetCommand extends BaseCommand implements RpcCommandInt
     }
 
     /**
-     * data.params[]:
-     *  [1]: id
+     * params[]:
+     *  [0]: itemCategory: resources.ItemCategory, optional
      *
-     * @param data
-     * @returns {Promise<ItemCategory>}
      */
-    @validate()
-    public async execute( @request(RpcRequest) data: RpcRequest): Promise<ItemCategory> {
-        return await this.itemCategoryService.findOne(data.params[0])
-            .catch(reason => {
-                throw new ModelNotFoundException('ItemCategory');
-            });
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('id', true, this.itemCategoryService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
     }
 
-    /**
-     * data.params[]:
-     *  [1]: id
-     *
-     * @param data
-     * @returns {Promise<RpcRequest>}
-     */
+    @validate()
+    public async execute( @request(RpcRequest) data: RpcRequest): Promise<resources.ItemCategory> {
+        return data.params[0];
+    }
+
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-        if (data.params.length < 1) {
-            throw new MissingParamException('categoryId');
-        }
-
-        if (typeof data.params[0] !== 'number') {
-            throw new InvalidParamException('categoryId', 'number');
-        }
-
+        await super.validate(data);
         return data;
     }
 
@@ -69,7 +53,7 @@ export class ItemCategoryGetCommand extends BaseCommand implements RpcCommandInt
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + ' \n'
-            + '    <categoryId>                  - Numeric - The ID belonging to the ItemCategory we want to retrive. \n';
+            + '    <categoryId>                  - number - ItemCategory ID. \n';
     }
 
     public description(): string {

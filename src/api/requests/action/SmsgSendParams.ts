@@ -15,5 +15,5 @@ export interface SmsgSendParams {
     anonFee: boolean;
     ringSize?: number;
     messageType?: CoreMessageVersion;   // use to override the message type
-    coinControl: SmsgSendCoinControl;
+    coinControl?: SmsgSendCoinControl;
 }

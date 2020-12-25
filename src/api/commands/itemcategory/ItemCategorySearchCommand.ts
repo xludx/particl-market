@@ -14,11 +14,14 @@ import { ItemCategory } from '../../models/ItemCategory';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { ItemCategorySearchParams } from '../../requests/search/ItemCategorySearchParams';
 import { MarketService } from '../../services/model/MarketService';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule,
+    StringValidationRule
+} from '../CommandParamValidation';
 
 export class ItemCategorySearchCommand extends BaseCommand implements RpcCommandInterface<Bookshelf.Collection<ItemCategory>> {
 
@@ -34,12 +37,20 @@ export class ItemCategorySearchCommand extends BaseCommand implements RpcCommand
     }
 
     /**
-     * data.params[]:
-     *  [0]: searchBy, string, can't be null
+     * params[]:
+     *  [0]: name, search string
+     *  [1]: marketId
      *
-     * @param data
-     * @returns {Promise<ItemCategory>}
      */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new StringValidationRule('name', true),
+                new IdValidationRule('marketId', true, this.marketService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<Bookshelf.Collection<ItemCategory>> {
         const name: string = data.params[0];
@@ -51,33 +62,8 @@ export class ItemCategorySearchCommand extends BaseCommand implements RpcCommand
         } as ItemCategorySearchParams);
     }
 
-    /**
-     * data.params[]:
-     *  [0]: name, search string
-     *  [1]: marketId
-     *
-     * @param data
-     * @returns {Promise<ItemCategory>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-        if (data.params.length < 1) {
-            throw new MissingParamException('name');
-        } else if (data.params.length < 2) {
-            throw new MissingParamException('marketId');
-        }
-
-        if (typeof data.params[0] !== 'string') {
-            throw new InvalidParamException('name', 'string');
-        } else if (typeof data.params[1] !== 'number') {
-            throw new InvalidParamException('marketId', 'number');
-        }
-
-        data.params[1] = await this.marketService.findOne(data.params[1])
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('Market');
-            });
-
+        await super.validate(data);
         return data;
     }
 
