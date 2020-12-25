@@ -14,19 +14,9 @@ import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands } from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
 import { MarketService } from '../../services/model/MarketService';
-import { MarketType } from '../../enums/MarketType';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
-import {
-    CommandParamValidationRules,
-    IdValidationRule,
-    ParamValidationRule,
-    StringValidationRule
-} from '../CommandParamValidation';
 
 export class ItemCategoryListCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Service) @named(Targets.Service.model.ItemCategoryService) private itemCategoryService: ItemCategoryService,
@@ -35,15 +25,6 @@ export class ItemCategoryListCommand extends BaseCommand implements RpcCommandIn
     ) {
         super(Commands.CATEGORY_LIST);
         this.log = new Logger(__filename);
-    }
-
-
-    public getCommandParamValidationRules(): CommandParamValidationRules {
-        return {
-            params: [
-                new IdValidationRule('marketId', false, this.marketService)
-            ] as ParamValidationRule[]
-        } as CommandParamValidationRules;
     }
 
     /**
@@ -65,7 +46,6 @@ export class ItemCategoryListCommand extends BaseCommand implements RpcCommandIn
         if (market) {
             return await this.itemCategoryService.findRoot(market.receiveAddress);
         } else {
-            // category list for MarketType.MARKETPLACE is the list of default categories
             // no market given? return default
             return await this.itemCategoryService.findDefaultRoot();
         }

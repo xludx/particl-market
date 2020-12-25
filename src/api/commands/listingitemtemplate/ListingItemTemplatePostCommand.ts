@@ -39,7 +39,7 @@ import { BooleanValidationRule, CommandParamValidationRules, EnumValidationRule,
 import { CoreMessageVersion } from '../../enums/CoreMessageVersion';
 import { RpcUnspentOutput } from 'omp-lib/dist/interfaces/rpc';
 import { BigNumber } from 'mathjs';
-import {SmsgSendCoinControl} from '../../services/SmsgService';
+import { SmsgSendCoinControl } from '../../services/SmsgService';
 
 
 export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCommandInterface<SmsgSendResponse> {

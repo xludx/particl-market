@@ -23,10 +23,14 @@ import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
 import { ModelNotModifiableException } from '../../exceptions/ModelNotModifiableException';
 import {ItemLocationCreateRequest} from '../../requests/model/ItemLocationCreateRequest';
+import {
+    CommandParamValidationRules,
+    IdValidationRule, NumberValidationRule,
+    ParamValidationRule,
+    StringValidationRule
+} from "../CommandParamValidation";
 
 export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommandInterface<ItemLocation> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -35,6 +39,33 @@ export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommand
     ) {
         super(Commands.ITEMLOCATION_UPDATE);
         this.log = new Logger(__filename);
+    }
+
+    /**
+     * params[]:
+     *  [0]: listingItemTemplateId
+     *  [1]: country (country/countryCode)
+     *  [2]: address, optional
+     *  [3]: gpsMarkerTitle, optional
+     *  [4]: gpsMarkerDescription, optional
+     *  [5]: gpsMarkerLatitude, optional
+     *  [6]: gpsMarkerLongitude, optional
+     *
+     * @param data
+     * @returns {Promise<RpcRequest>}
+     */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('listingItemTemplateId', true, this.listingItemTemplateService),
+                new StringValidationRule('country', true),
+                new StringValidationRule('address', false),
+                new StringValidationRule('gpsMarkerTitle', false),
+                new StringValidationRule('gpsMarkerDescription', false),
+                new NumberValidationRule('gpsMarkerLatitude', false),
+                new NumberValidationRule('gpsMarkerLongitude', false)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
     }
 
     /**
@@ -81,41 +112,16 @@ export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommand
         }
     }
 
-    /**
-     * data.params[]:
-     *  [0]: listingItemTemplateId
-     *  [1]: country (country/countryCode)
-     *  [2]: address, optional
-     *  [3]: gpsMarkerTitle, optional
-     *  [4]: gpsMarkerDescription, optional
-     *  [5]: gpsMarkerLatitude, optional
-     *  [6]: gpsMarkerLongitude, optional
-     *
-     * @param data
-     * @returns {Promise<RpcRequest>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-        if (data.params.length < 1) {
-            throw new MissingParamException('listingItemTemplateId');
-        } else if (data.params.length < 2) {
-            throw new MissingParamException('country');
-        }
+        await super.validate(data);
 
-        const listingItemTemplateId = data.params[0];   // required
+        const listingItemTemplate: resources.ListingItemTemplate = data.params[0];   // required
         const country = data.params[1];                 // required
         const address = data.params[2];                 // optional
         const gpsMarkerTitle = data.params[3];          // optional
         const gpsMarkerDescription = data.params[4];    // optional
         const gpsMarkerLatitude = data.params[5];       // optional
         const gpsMarkerLongitude = data.params[6];      // optional
-
-        if (typeof listingItemTemplateId !== 'number') {
-            throw new InvalidParamException('listingItemTemplateId', 'number');
-        } else if (typeof country !== 'string') {
-            throw new InvalidParamException('country', 'string');
-        } else if (!_.isNil(address) && typeof address !== 'string') {
-            throw new InvalidParamException('address', 'string');
-        }
 
         if (data.params.length > 3) {
             if (data.params.length < 5) {
@@ -141,13 +147,6 @@ export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommand
         // If countryCode is country code, validate, and possibly throw error.
         data.params[1] = ShippingCountries.convertAndValidate(country);
 
-        // make sure ListingItemTemplate with the id exists
-        const listingItemTemplate: resources.ListingItemTemplate = await this.listingItemTemplateService.findOne(listingItemTemplateId)
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('ListingItemTemplate');
-            });
-
         if (_.isEmpty(listingItemTemplate.ItemInformation)) {
             throw new ModelNotFoundException('ItemInformation');
         }
@@ -156,8 +155,6 @@ export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommand
         if (!isModifiable) {
             throw new ModelNotModifiableException('ListingItemTemplate');
         }
-
-        data.params[0] = listingItemTemplate;
 
         return data;
     }

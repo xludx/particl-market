@@ -39,7 +39,7 @@ import { CoreMessageVersion } from '../../enums/CoreMessageVersion';
 import PQueue, {DefaultAddOptions, Options} from 'pm-queue';
 import PriorityQueue, {PriorityQueueOptions} from 'pm-queue/dist/priority-queue';
 import { SmsgSendCoinControl } from '../../services/SmsgService';
-import {RpcBlindSendToOutput} from 'omp-lib/dist/interfaces/rpc';
+import { RpcBlindSendToOutput } from 'omp-lib/dist/interfaces/rpc';
 
 export interface RpcInput {
     tx: string;     // txid

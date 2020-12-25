@@ -24,7 +24,6 @@ import { ModelNotModifiableException } from '../../exceptions/ModelNotModifiable
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule, StringValidationRule } from '../CommandParamValidation';
 import { MessageException } from '../../exceptions/MessageException';
 
-
 export class ItemInformationUpdateCommand extends BaseCommand implements RpcCommandInterface<ItemInformation> {
 
     constructor(
@@ -35,7 +34,6 @@ export class ItemInformationUpdateCommand extends BaseCommand implements RpcComm
     ) {
         super(Commands.ITEMINFORMATION_UPDATE);
         this.log = new Logger(__filename);
-
         // this.debug = true;
     }
 
