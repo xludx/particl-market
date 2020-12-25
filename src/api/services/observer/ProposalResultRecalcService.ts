@@ -84,7 +84,6 @@ export class ProposalResultRecalcService extends BaseObserverService {
         } as ProposalSearchParams).then(value => value.toJSON());
 
         // const newBlacklists: resources.Blacklist[] = [];
-
         for (const proposal of expiredProposals) {
             // calculate the final ProposalResult
             const proposalResult = await this.proposalService.recalculateProposalResult(proposal);
