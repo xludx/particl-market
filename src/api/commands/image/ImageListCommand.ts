@@ -21,7 +21,6 @@ import { MarketService } from '../../services/model/MarketService';
 import { BooleanValidationRule, CommandParamValidationRules, NumberValidationRule, ParamValidationRule, StringValidationRule } from '../CommandParamValidation';
 import { ImageDataService } from '../../services/model/ImageDataService';
 
-
 export class ImageListCommand extends BaseCommand implements RpcCommandInterface<resources.Image[]> {
 
     constructor(

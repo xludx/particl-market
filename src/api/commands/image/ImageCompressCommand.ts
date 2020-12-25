@@ -29,7 +29,6 @@ import {
 } from '../CommandParamValidation';
 import { EnumHelper } from '../../../core/helpers/EnumHelper';
 
-
 export class ImageCompressCommand extends BaseCommand implements RpcCommandInterface<Image> {
 
     constructor(

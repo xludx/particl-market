@@ -13,16 +13,13 @@ import { RpcRequest } from '../../requests/RpcRequest';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule
+} from '../CommandParamValidation';
 
-/**
- * Command for removing an item from your favorites.
- */
 export class FavoriteRemoveCommand extends BaseCommand implements RpcCommandInterface<void> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -32,42 +29,21 @@ export class FavoriteRemoveCommand extends BaseCommand implements RpcCommandInte
         this.log = new Logger(__filename);
     }
 
-    /**
-     *
-     * data.params[]:
-     *  [0]: favoriteItemId
-     *
-     */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('favoriteItemId', true, this.favoriteItemService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<void> {
         return this.favoriteItemService.destroy(data.params[0]);
     }
 
-    /**
-     *
-     *  data.params[]:
-     *  [0]: favoriteItemId
-     *
-     * @param {RpcRequest} data
-     * @returns {Promise<RpcRequest>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-
-        if (data.params.length < 1) {
-            throw new MissingParamException('favoriteItemId');
-        }
-
-        if (!_.isNil(data.params[0]) && typeof data.params[0] !== 'number') {
-            throw new InvalidParamException('favoriteItemId', 'number');
-        }
-
-        // make sure FavoriteItem exists
-        await this.favoriteItemService.findOne(data.params[0])
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('FavoriteItem');
-            });
-
+        await super.validate(data);
         return data;
     }
 
@@ -77,7 +53,7 @@ export class FavoriteRemoveCommand extends BaseCommand implements RpcCommandInte
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + '\n'
-            + '    <favoriteItemId>                   - number - The Id of the FavoriteItemId.\n';
+            + '    <favoriteItemId>                   - number, FavoriteItem ID.\n';
     }
 
     public description(): string {

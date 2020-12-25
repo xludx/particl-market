@@ -18,9 +18,7 @@ import { ListingItemTemplateService } from '../../services/model/ListingItemTemp
 import { ModelNotModifiableException } from '../../exceptions/ModelNotModifiableException';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
-
 export class ImageRemoveCommand extends BaseCommand implements RpcCommandInterface<void> {
-
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,

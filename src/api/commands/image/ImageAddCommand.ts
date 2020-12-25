@@ -29,7 +29,6 @@ import { BooleanValidationRule, CommandParamValidationRules, EnumValidationRule,
     StringValidationRule } from '../CommandParamValidation';
 import { EnumHelper } from '../../../core/helpers/EnumHelper';
 
-
 export class ImageAddCommand extends BaseCommand implements RpcCommandInterface<Image> {
 
     constructor(
