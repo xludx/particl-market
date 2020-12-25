@@ -60,7 +60,7 @@ export interface ItemCategoryCreateParams extends ModelCreateParams {
 
 export interface ImageCreateParams extends ModelCreateParams {
     actionMessage: BaseImageAddMessage;
-    listingItemTemplate?: resources.ListingItem;
+    listingItemTemplate?: resources.ListingItem | resources.ListingItemTemplate;
 }
 
 export interface BidCreateParams extends ModelCreateParams {

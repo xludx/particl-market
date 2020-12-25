@@ -198,7 +198,8 @@ export const Targets = {
         },
         admin: {
             AdminCommand: 'AdminCommand',
-            StatusCommand: 'StatusCommand'
+            StatusCommand: 'StatusCommand',
+            PublishTestDataCommand: 'PublishTestDataCommand'
         },
         BaseCommand: 'BaseCommand',
         BaseSearchCommand: 'BaseSearchCommand',

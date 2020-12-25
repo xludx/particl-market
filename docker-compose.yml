@@ -24,7 +24,7 @@ services:
 #        source: ../particl-market-data/app1_node_modules/
 #        target: /app/node_modules
     ports:
-      - 3100:45492
+      - 45592:45592
 
     command: bin/entrypoint.sh
     links:
@@ -66,7 +66,7 @@ services:
 #        target: /app/node_modules
 
     ports:
-      - 3200:45692
+      - 45692:45692
     command: bin/entrypoint.sh
     links:
       - particld2

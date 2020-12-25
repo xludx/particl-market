@@ -39,6 +39,7 @@ import { BooleanValidationRule, CommandParamValidationRules, EnumValidationRule,
 import { CoreMessageVersion } from '../../enums/CoreMessageVersion';
 import { RpcUnspentOutput } from 'omp-lib/dist/interfaces/rpc';
 import { BigNumber } from 'mathjs';
+import {SmsgSendCoinControl} from '../../services/SmsgService';
 
 
 export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCommandInterface<SmsgSendResponse> {
@@ -100,6 +101,7 @@ export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCo
         const market: resources.Market = data.params[4];
         const anonFee: boolean = data.params[5];
         const ringSize: number = data.params[6];
+        const coinControl: SmsgSendCoinControl = data.params[7];
 
         const fromAddress = market.publishAddress;
         const toAddress = market.receiveAddress;
@@ -116,7 +118,8 @@ export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCo
                 daysRetention,
                 estimateFee,
                 anonFee,
-                ringSize
+                ringSize,
+                coinControl
             } as SmsgSendParams,
             listingItem: listingItemTemplate,
             sellerAddress: market.Identity.address,
@@ -159,6 +162,7 @@ export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCo
             smsgSendResponse.error = 'Not enough utxos.';
         }
 
+        this.log.debug('smsgSendResponse: ', JSON.stringify(smsgSendResponse, null, 2));
         return smsgSendResponse;
     }
 
@@ -209,9 +213,8 @@ export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCo
         // this.log.debug('market:', JSON.stringify(market, null, 2));
 
         // update the paymentAddress in case it's not generated yet
-        if (!listingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress
-            || _.isEmpty(listingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress)) {
-            listingItemTemplate = await this.updatePaymentAddress(market.Identity, listingItemTemplate);
+        if (_.isEmpty(listingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress)) {
+            listingItemTemplate = await this.listingItemTemplateService.updatePaymentAddress(market.Identity, listingItemTemplate);
         }
 
         // this.log.debug('listingItemTemplate:', JSON.stringify(listingItemTemplate, null, 2));
@@ -244,55 +247,6 @@ export class ListingItemTemplatePostCommand extends BaseCommand implements RpcCo
 
     public example(): string {
         return 'template ' + this.getName() + ' 100 7 false';
-    }
-
-    private async generateCryptoAddressForEscrowType(identity: resources.Identity, type: EscrowType): Promise<CryptoAddress> {
-
-        // generate paymentAddress for the item
-        let cryptoAddress: CryptoAddress;
-        switch (type) {
-            case EscrowType.MULTISIG:
-                const address = await this.coreRpcService.getNewAddress(identity.wallet);
-                cryptoAddress = {
-                    address,
-                    type: CryptoAddressType.NORMAL
-                };
-                break;
-            case EscrowType.MAD_CT:
-                cryptoAddress = await this.coreRpcService.getNewStealthAddress(identity.wallet);
-                break;
-            case EscrowType.MAD:
-            case EscrowType.FE:
-            default:
-                throw new NotImplementedException();
-        }
-
-        return cryptoAddress;
-    }
-
-    /**
-     * update the paymentaddress for the template to one from the given identity
-     */
-    private async updatePaymentAddress(identity: resources.Identity, listingItemTemplate: resources.ListingItemTemplate):
-        Promise<resources.ListingItemTemplate> {
-
-        return await this.generateCryptoAddressForEscrowType(identity, listingItemTemplate.PaymentInformation.Escrow.type)
-            .then( async paymentAddress => {
-                // create new CryptocurrencyAddress related to the ListingItemTemplate
-                return await this.cryptocurrencyAddressService.create({
-                    profile_id: listingItemTemplate.Profile.id,
-                    type: paymentAddress.type,
-                    address: paymentAddress.address
-                } as CryptocurrencyAddressCreateRequest)
-                    .then(async cryptocurrencyAddressModel => {
-                        // update relation to the created CryptocurrencyAddress
-                        const cryptocurrencyAddress: resources.CryptocurrencyAddress = cryptocurrencyAddressModel.toJSON();
-                        await this.itemPriceService.updatePaymentAddress(listingItemTemplate.PaymentInformation.ItemPrice.id, cryptocurrencyAddress.id);
-
-                        // finally, fetch updated ListingItemTemplate
-                        return await this.listingItemTemplateService.findOne(listingItemTemplate.id).then(updatedTemplate => updatedTemplate.toJSON());
-                    });
-            });
     }
 
     /**

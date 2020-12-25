@@ -3,6 +3,7 @@
 // file COPYING or https://github.com/particl/particl-market/blob/develop/LICENSE
 
 import { CoreMessageVersion } from '../../enums/CoreMessageVersion';
+import { SmsgSendCoinControl } from '../../services/SmsgService';
 
 export interface SmsgSendParams {
 
@@ -14,4 +15,5 @@ export interface SmsgSendParams {
     anonFee: boolean;
     ringSize?: number;
     messageType?: CoreMessageVersion;   // use to override the message type
+    coinControl: SmsgSendCoinControl;
 }

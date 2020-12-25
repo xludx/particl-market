@@ -13,10 +13,9 @@ import { ItemCategory } from '../../models/ItemCategory';
 import { RpcCommandInterface } from '../RpcCommandInterface';
 import { Commands } from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { MarketService } from '../../services/model/MarketService';
 import { MarketType } from '../../enums/MarketType';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
 export class ItemCategoryListCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
 
@@ -29,6 +28,15 @@ export class ItemCategoryListCommand extends BaseCommand implements RpcCommandIn
     ) {
         super(Commands.CATEGORY_LIST);
         this.log = new Logger(__filename);
+    }
+
+
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('marketId', false, this.marketService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
     }
 
     /**
@@ -60,19 +68,7 @@ export class ItemCategoryListCommand extends BaseCommand implements RpcCommandIn
      * @returns {Promise<ItemCategory>}
      */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-
-        if (data.params[0] && typeof data.params[0] !== 'number') {
-            throw new InvalidParamException('marketId', 'number');
-        }
-
-        if (data.params[0]) {
-            data.params[0] = await this.marketService.findOne(data.params[0])
-                .then(value => value.toJSON())
-                .catch(reason => {
-                    throw new ModelNotFoundException('Market');
-                });
-        }
-
+        await super.validate(data);
         return data;
     }
 

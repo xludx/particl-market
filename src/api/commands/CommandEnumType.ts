@@ -6,7 +6,6 @@ import { Enum, EnumValue } from 'ts-enums';
 import { Command } from './Command';
 import { EnvironmentType } from '../../core/helpers/Environment';
 
-
 export class CommandEnumType extends Enum<Command> {
 
     public DAEMON_ROOT: Command     = new Command('daemon', 'daemon', true, [], EnvironmentType.ALL);
@@ -20,8 +19,9 @@ export class CommandEnumType extends Enum<Command> {
 
     // public ADMIN_DATA: Command    = new Command('admindata', 'data', true); // link to root
     public ADMIN_STATUS: Command    = new Command('adminstatus', 'status', false);
+    public ADMIN_PUBLISH_TEST_DATA: Command    = new Command('adminpublishtestdata', 'test', false);
     public ADMIN_ROOT: Command      = new Command('admin', 'admin', true,
-        [this.ADMIN_STATUS, this.DATA_ROOT], EnvironmentType.DEVELOPMENT);
+        [this.ADMIN_STATUS, this.ADMIN_PUBLISH_TEST_DATA, this.DATA_ROOT], EnvironmentType.DEVELOPMENT);
 
     public BID_SEARCH: Command      = new Command('bidsearch', 'search', false);
     public BID_GET: Command         = new Command('bidget', 'get', false);
