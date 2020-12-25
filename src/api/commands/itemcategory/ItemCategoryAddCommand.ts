@@ -34,6 +34,15 @@ export class ItemCategoryAddCommand extends BaseCommand implements RpcCommandInt
         this.log = new Logger(__filename);
     }
 
+    /**
+     * creates a new user defined category
+     *
+     * params[]:
+     *  [0]: market: resources.Market
+     *  [1]: categoryName
+     *  [2]: description
+     *  [3]: parentItemCategory: resources.ItemCategory
+     */
     public getCommandParamValidationRules(): CommandParamValidationRules {
         return {
             params: [
@@ -45,18 +54,6 @@ export class ItemCategoryAddCommand extends BaseCommand implements RpcCommandInt
         } as CommandParamValidationRules;
     }
 
-    /**
-     * creates a new user defined category
-     *
-     * data.params[]:
-     *  [0]: market: resources.Market
-     *  [1]: categoryName
-     *  [2]: description
-     *  [3]: parentItemCategory: resources.ItemCategory
-     *
-     * @param data
-     * @returns {Promise<ItemCategory>}
-     */
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<ItemCategory> {
 

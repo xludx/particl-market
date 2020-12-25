@@ -16,6 +16,13 @@ import { BaseCommand } from '../BaseCommand';
 import { MarketService } from '../../services/model/MarketService';
 import { MarketType } from '../../enums/MarketType';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
+import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule,
+    StringValidationRule
+} from '../CommandParamValidation';
 
 export class ItemCategoryListCommand extends BaseCommand implements RpcCommandInterface<ItemCategory> {
 
@@ -40,18 +47,22 @@ export class ItemCategoryListCommand extends BaseCommand implements RpcCommandIn
     }
 
     /**
-     *
-     * data.params[]:
+     * params[]:
      *  [0]: market: resources.Market, optional
      *
-     * @param data
-     * @returns {Promise<ItemCategory>}
      */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('marketId', false, this.marketService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<ItemCategory> {
         const market: resources.Market = data.params[0];
-        if (market && market.type !== MarketType.MARKETPLACE) {
-            // for storefronts its the list of market categories
+        if (market) {
             return await this.itemCategoryService.findRoot(market.receiveAddress);
         } else {
             // category list for MarketType.MARKETPLACE is the list of default categories
