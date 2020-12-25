@@ -205,7 +205,7 @@ export class SmsgService {
         } as SmsgSendOptions;
 
         return await this.smsgSend(sendParams.wallet, sendParams.fromAddress, sendParams.toAddress, marketplaceMessage, paidMessage,
-            sendParams.daysRetention, sendParams.estimateFee, options);
+            sendParams.daysRetention, sendParams.estimateFee, options, sendParams.coinControl);
     }
 
     /**

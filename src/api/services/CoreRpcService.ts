@@ -658,7 +658,8 @@ export class CoreRpcService extends CtRpc {
      * @param outputs       (json array, required) A json array of json objects
      * @param estimateFee
      */
-    public async sendTypeTo(wallet: string, typeIn: OutputType, typeOut: OutputType, outputs: RpcBlindSendToOutput[],
+    public async sendTypeTo(wallet: string, typeIn: OutputType, typeOut: OutputType,
+                            outputs: RpcBlindSendToOutput[],
                             estimateFee: boolean = false): Promise<string | any> {
 
         let params: any[] = [
@@ -787,6 +788,22 @@ export class CoreRpcService extends CtRpc {
             params.push(blockhash);
         }
         return await this.call('getrawtransaction', params);
+    }
+
+    /**
+     * Get detailed information about in-wallet transaction <txid>
+     *
+     * @param wallet
+     * @param txid
+     * @param includeWatchonly
+     * @param verbose
+     */
+    public async getTransaction(wallet: string, txid: string, includeWatchonly: boolean = false, verbose: boolean = true): Promise<any> {
+        const params: any[] = [];
+        params.push(txid);
+        params.push(includeWatchonly);
+        params.push(verbose);
+        return await this.call('gettransaction', params, wallet);
     }
 
     /**

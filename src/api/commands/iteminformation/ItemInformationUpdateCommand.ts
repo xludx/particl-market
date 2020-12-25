@@ -76,7 +76,7 @@ export class ItemInformationUpdateCommand extends BaseCommand implements RpcComm
         const longDescription = data.params[3];                                     // required
         const itemCategory: resources.ItemCategory = data.params[4];                // optional
 
-        return this.itemInformationService.update(listingItemTemplate.ItemInformation.id, {
+        return await this.itemInformationService.update(listingItemTemplate.ItemInformation.id, {
             title,
             shortDescription,
             longDescription,

@@ -53,6 +53,13 @@ import { DSN, ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
 import { HashMismatchException } from '../../exceptions/HashMismatchException';
 import { CoreMessageVersion } from '../../enums/CoreMessageVersion';
 import { ModelServiceInterface } from '../ModelServiceInterface';
+import { CryptocurrencyAddressCreateRequest } from '../../requests/model/CryptocurrencyAddressCreateRequest';
+import { EscrowType } from 'omp-lib/dist/interfaces/omp-enums';
+import { CryptoAddress, CryptoAddressType } from 'omp-lib/dist/interfaces/crypto';
+import { NotImplementedException } from '../../exceptions/NotImplementedException';
+import { CryptocurrencyAddressService } from './CryptocurrencyAddressService';
+import { ItemPriceService } from './ItemPriceService';
+import { CoreRpcService } from '../CoreRpcService';
 
 
 export class ListingItemTemplateService implements ModelServiceInterface<ListingItemTemplate> {
@@ -71,9 +78,12 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
         @inject(Types.Service) @named(Targets.Service.model.PaymentInformationService) public paymentInformationService: PaymentInformationService,
         @inject(Types.Service) @named(Targets.Service.model.MessagingInformationService) public messagingInformationService: MessagingInformationService,
         @inject(Types.Service) @named(Targets.Service.model.ListingItemObjectService) public listingItemObjectService: ListingItemObjectService,
-        @inject(Types.Factory) @named(Targets.Factory.model.ListingItemFactory) private listingItemFactory: ListingItemFactory,
-        @inject(Types.Factory) @named(Targets.Factory.model.ImageDataFactory) private imageDataFactory: ImageDataFactory,
-        @inject(Types.Factory) @named(Targets.Factory.model.ImageFactory) private imageFactory: ImageFactory,
+        @inject(Types.Service) @named(Targets.Service.model.CryptocurrencyAddressService) public cryptocurrencyAddressService: CryptocurrencyAddressService,
+        @inject(Types.Service) @named(Targets.Service.model.ItemPriceService) public itemPriceService: ItemPriceService,
+        @inject(Types.Service) @named(Targets.Service.CoreRpcService) public coreRpcService: CoreRpcService,
+        @inject(Types.Factory) @named(Targets.Factory.model.ListingItemFactory) public listingItemFactory: ListingItemFactory,
+        @inject(Types.Factory) @named(Targets.Factory.model.ImageDataFactory) public imageDataFactory: ImageDataFactory,
+        @inject(Types.Factory) @named(Targets.Factory.model.ImageFactory) public imageFactory: ImageFactory,
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
     ) {
         this.log = new Logger(__filename);
@@ -196,7 +206,6 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
         //    + targetParentId + ', market: ' + (market ? market.id : undefined));
         this.log.debug('clone(), targetParentId: ', targetParentId);
         const createRequest = await this.getCloneCreateRequest(listingItemTemplate, targetParentId, market);
-        this.log.debug('clone(), createRequest: ', JSON.stringify(createRequest, null, 2));
 
         listingItemTemplate = await this.create(createRequest).then(value => value.toJSON());
 
@@ -351,6 +360,23 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
         return updated;
     }
 
+    /**
+     * update the paymentaddress for the template to one from the given identity
+     */
+    public async updatePaymentAddress(identity: resources.Identity, listingItemTemplate: resources.ListingItemTemplate):
+        Promise<resources.ListingItemTemplate> {
+
+        const paymentAddress: CryptoAddress = await this.generateCryptoAddressForEscrowType(identity, listingItemTemplate.PaymentInformation.Escrow.type);
+        const cryptocurrencyAddress: resources.CryptocurrencyAddress = await this.cryptocurrencyAddressService.create({
+            profile_id: listingItemTemplate.Profile.id,
+            type: paymentAddress.type,
+            address: paymentAddress.address
+        } as CryptocurrencyAddressCreateRequest).then(value => value.toJSON());
+
+        await this.itemPriceService.updatePaymentAddress(listingItemTemplate.PaymentInformation.ItemPrice.id, cryptocurrencyAddress.id);
+        return await this.findOne(listingItemTemplate.id).then(updatedTemplate => updatedTemplate.toJSON());
+    }
+
     public async isModifiable(id: number): Promise<boolean> {
         const listingItemTemplate: resources.ListingItemTemplate = await this.findOne(id).then(value => value.toJSON());
 
@@ -412,6 +438,27 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
             this.log.error('ListingItemTemplate has no Images.');
             throw new MessageException('ListingItemTemplate has no Images.');
         }
+    }
+
+    private async generateCryptoAddressForEscrowType(identity: resources.Identity, type: EscrowType): Promise<CryptoAddress> {
+        let cryptoAddress: CryptoAddress;
+        switch (type) {
+            case EscrowType.MULTISIG:
+                const address = await this.coreRpcService.getNewAddress(identity.wallet);
+                cryptoAddress = {
+                    address,
+                    type: CryptoAddressType.NORMAL
+                };
+                break;
+            case EscrowType.MAD_CT:
+                cryptoAddress = await this.coreRpcService.getNewStealthAddress(identity.wallet);
+                break;
+            case EscrowType.MAD:
+            case EscrowType.FE:
+            default:
+                throw new NotImplementedException();
+        }
+        return cryptoAddress;
     }
 
     private async checkExistingObjectFieldValueExistsInArray<T>(objectArray: T[], fieldName: string, value: string | number): Promise<T | undefined> {

@@ -50,9 +50,7 @@ export class ItemPriceService {
 
     @validate()
     public async create( @request(ItemPriceCreateRequest) data: ItemPriceCreateRequest): Promise<ItemPrice> {
-
         const body = JSON.parse(JSON.stringify(data));
-        // this.log.debug('body: ', JSON.stringify(body, null, 2));
 
         const shippingPrice = body.shippingPrice || {};
         const cryptocurrencyAddress = body.cryptocurrencyAddress || {};
@@ -64,8 +62,9 @@ export class ItemPriceService {
             if (cryptocurrencyAddress.id) {
                 body.cryptocurrency_address_id = cryptocurrencyAddress.id;
             } else {
-                const relatedCryAddress = await this.cryptocurrencyAddressService.create(cryptocurrencyAddress as CryptocurrencyAddressCreateRequest);
-                body.cryptocurrency_address_id = relatedCryAddress.Id;
+                const relatedCryAddress = await this.cryptocurrencyAddressService.create(cryptocurrencyAddress as CryptocurrencyAddressCreateRequest)
+                    .then(value => value.toJSON());
+                body.cryptocurrency_address_id = relatedCryAddress.id;
             }
         }
 

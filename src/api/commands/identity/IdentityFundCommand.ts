@@ -59,8 +59,8 @@ export class IdentityFundCommand extends BaseCommand implements RpcCommandInterf
      *  [1]: walletFrom: string
      *  [2]: amount: number
      *  [3]: outputCount: number, optional, default: 10
-     *  [3]: fromType: OutputType, optional, default: OutputType.PART
-     *  [3]: estimateFee: boolean, optional, default: false
+     *  [4]: fromType: OutputType, optional, default: OutputType.PART
+     *  [5]: estimateFee: boolean, optional, default: false
      */
     public getCommandParamValidationRules(): CommandParamValidationRules {
         return {
