@@ -17,15 +17,11 @@ import { FavoriteItemCreateRequest } from '../../requests/model/FavoriteItemCrea
 import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
 import { MessageException } from '../../exceptions/MessageException';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
 import {
     CommandParamValidationRules,
     IdValidationRule,
-    ParamValidationRule,
-    StringValidationRule
-} from "../CommandParamValidation";
+    ParamValidationRule
+} from '../CommandParamValidation';
 
 export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterface<FavoriteItem> {
 
@@ -65,6 +61,7 @@ export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterfa
     }
 
     public async validate(data: RpcRequest): Promise<RpcRequest> {
+        await super.validate(data);
 
         const profile: resources.Profile = data.params[0];
         const listingItem: resources.ListingItem = data.params[1];
