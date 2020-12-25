@@ -175,7 +175,7 @@ export class ImageService {
         if (_.isNil(imageDataOriginal)) {
             throw new ModelNotFoundException('ImageData');
         }
-        this.log.debug('resized image exists: ', !_.isNil(imageDataResized));
+        // this.log.debug('resized image exists: ', !_.isNil(imageDataResized));
 
         const originalData = await this.imageDataService.loadImageFile(image.hash, ImageVersions.ORIGINAL.propName)
             .catch(reason => {
@@ -268,9 +268,6 @@ export class ImageService {
 
     public async destroy(id: number): Promise<void> {
         const image: resources.Image = await this.findOne(id, true).then(value => value.toJSON());
-        this.log.debug('destroy(), remove image, hash: ', image.hash);
-
-        // find and remove ImageDatas and files
         for (const imageData of image.ImageDatas) {
             await this.imageDataService.destroy(imageData.id);
         }

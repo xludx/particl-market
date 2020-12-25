@@ -112,7 +112,6 @@ export class ImageDataService {
 
     public async destroy(id: number): Promise<void> {
         const imageData: resources.ImageData = await this.findOne(id, false).then(value => value.toJSON());
-        this.log.debug('destroy(), remove imageData.id: ' + imageData.id);
         await this.removeImageFile(imageData.imageHash, imageData.imageVersion);
         await this.imageDataRepo.destroy(id);
     }
@@ -146,7 +145,7 @@ export class ImageDataService {
      * @param imageVersion
      */
     public async removeImageFile(imageHash: string, imageVersion: string): Promise<void> {
-        this.log.debug('removeImageFile(), imageVersion: ', imageVersion);
+        // this.log.debug('removeImageFile(), imageVersion: ', imageVersion);
 
         const imageDatas: resources.ImageData[] = await this.findAllByImageHashAndVersion(imageHash, imageVersion).then(value => value.toJSON());
         if (imageDatas.length === 0) {
@@ -167,9 +166,9 @@ export class ImageDataService {
                 this.log.error('removeImageFile(), image file remove failed: ' + err);
                 throw new MessageException('Image remove failed: ' + err);
             }
-        } else {
-            this.log.debug('removeImageFile(): multiple images using the same data file, skipping...');
-        }
+        } // else {
+            // this.log.debug('removeImageFile(): multiple images using the same data file, skipping...');
+        // }
 
     }
 

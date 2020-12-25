@@ -31,8 +31,6 @@ import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } fr
 
 export class EscrowLockCommand extends BaseCommand implements RpcCommandInterface<SmsgSendResponse> {
 
-    public log: LoggerType;
-
     private PARAMS_KEYS: string[] = [
         BidDataValue.DELIVERY_CONTACT_PHONE.toString(),
         BidDataValue.DELIVERY_CONTACT_EMAIL.toString()
