@@ -28,7 +28,6 @@ export class IdentityAddCommand extends BaseCommand implements RpcCommandInterfa
     ) {
         super(Commands.IDENTITY_ADD);
         this.log = new Logger(__filename);
-
         // this.debug = true;
     }
 

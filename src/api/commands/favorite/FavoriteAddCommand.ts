@@ -20,13 +20,14 @@ import { MessageException } from '../../exceptions/MessageException';
 import { MissingParamException } from '../../exceptions/MissingParamException';
 import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule,
+    StringValidationRule
+} from "../CommandParamValidation";
 
-/**
- * Command for adding an item to your favorites, identified by ID or hash.
- */
 export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterface<FavoriteItem> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -39,16 +40,19 @@ export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterfa
     }
 
     /**
-     *
-     * data.params[]:
-     *  [0]: profile: resources.Profile
-     *  [1]: listingItem: resources.ListingItem
-     *
-     * when data.params[1] is number then findById, else findOneByHash
-     *
-     * @param data
-     * @returns {Promise<FavoriteItem>}
+     * params[]:
+     *  [0]: profileId
+     *  [1]: listingItemId
      */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('profileId', true, this.profileService),
+                new IdValidationRule('listingItemId', true, this.listingItemService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<FavoriteItem> {
         const profile: resources.Profile = data.params[0];
@@ -60,46 +64,10 @@ export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterfa
         } as FavoriteItemCreateRequest);
     }
 
-    /**
-     * validate that profile and item exists
-     *
-     * data.params[]:
-     *  [0]: profileId
-     *  [1]: listingItemId
-     *
-     * @param {RpcRequest} data
-     * @returns {Promise<RpcRequest>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
 
-        if (data.params.length < 1) {
-            throw new MissingParamException('profileId');
-        } else if (data.params.length < 2) {
-            throw new MissingParamException('listingItemId');
-        }
-
-        const profileId = data.params[0];
-        const listingItemId = data.params[1];
-
-        if (profileId && typeof profileId !== 'number') {
-            throw new InvalidParamException('profileId', 'number');
-        } else if (listingItemId && typeof listingItemId !== 'number') {
-            throw new InvalidParamException('listingItemId', 'number');
-        }
-
-        // make sure Profile exists
-        const profile: resources.Profile = await this.profileService.findOne(profileId)
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('Profile');
-            });
-
-        // make sure ListingItem exists
-        const listingItem: resources.ListingItem = await this.listingItemService.findOne(listingItemId)
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('ListingItem');
-            });
+        const profile: resources.Profile = data.params[0];
+        const listingItem: resources.ListingItem = data.params[1];
 
         await this.favoriteItemService.findOneByProfileIdAndListingItemId(profile.id, listingItem.id)
             .then(value => {
@@ -110,8 +78,6 @@ export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterfa
                 // return RpcRequest with the correct data to be passed to execute
             });
 
-        data.params[0] = profile;
-        data.params[1] = listingItem;
         return data;
     }
 
@@ -121,8 +87,8 @@ export class FavoriteAddCommand extends BaseCommand implements RpcCommandInterfa
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + '\n'
-            + '    <profileId>                   - number - The Id of the Profile. \n'
-            + '    <listingItemId>               - number - The Id of the ListingItem. \n';
+            + '    <profileId>                   - number, The Profile ID. \n'
+            + '    <listingItemId>               - number, The ListingItem ID. \n';
     }
 
     public description(): string {

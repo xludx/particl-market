@@ -22,13 +22,13 @@ import { MissingParamException } from '../../exceptions/MissingParamException';
 import { InvalidParamException } from '../../exceptions/InvalidParamException';
 import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
 import { ModelNotModifiableException } from '../../exceptions/ModelNotModifiableException';
-import {ItemLocationCreateRequest} from '../../requests/model/ItemLocationCreateRequest';
+import { ItemLocationCreateRequest } from '../../requests/model/ItemLocationCreateRequest';
 import {
     CommandParamValidationRules,
     IdValidationRule, NumberValidationRule,
     ParamValidationRule,
     StringValidationRule
-} from "../CommandParamValidation";
+} from '../CommandParamValidation';
 
 export class ItemLocationUpdateCommand extends BaseCommand implements RpcCommandInterface<ItemLocation> {
 

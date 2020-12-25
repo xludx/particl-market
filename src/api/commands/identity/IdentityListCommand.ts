@@ -18,7 +18,6 @@ import { IdentityService } from '../../services/model/IdentityService';
 import { Collection } from 'bookshelf';
 import { CommandParamValidationRules, IdValidationRule, ParamValidationRule } from '../CommandParamValidation';
 
-
 export class IdentityListCommand extends BaseCommand implements RpcCommandInterface<Collection<Identity>> {
 
     constructor(

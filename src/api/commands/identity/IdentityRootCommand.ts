@@ -14,10 +14,7 @@ import { Commands } from '../CommandEnumType';
 
 export class IdentityRootCommand extends BaseCommand implements RpcCommandInterface<void> {
 
-    public log: LoggerType;
-
     constructor(
-
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
     ) {
         super(Commands.IDENTITY_ROOT);

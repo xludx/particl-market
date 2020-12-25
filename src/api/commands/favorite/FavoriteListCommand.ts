@@ -15,13 +15,13 @@ import { Commands} from '../CommandEnumType';
 import { BaseCommand } from '../BaseCommand';
 import { ProfileService } from '../../services/model/ProfileService';
 import { FavoriteItemService } from '../../services/model/FavoriteItemService';
-import { MissingParamException } from '../../exceptions/MissingParamException';
-import { InvalidParamException } from '../../exceptions/InvalidParamException';
-import { ModelNotFoundException } from '../../exceptions/ModelNotFoundException';
+import {
+    CommandParamValidationRules,
+    IdValidationRule,
+    ParamValidationRule
+} from '../CommandParamValidation';
 
 export class FavoriteListCommand extends BaseCommand implements RpcCommandInterface<Bookshelf.Collection<FavoriteItem>> {
-
-    public log: LoggerType;
 
     constructor(
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType,
@@ -32,48 +32,22 @@ export class FavoriteListCommand extends BaseCommand implements RpcCommandInterf
         this.log = new Logger(__filename);
     }
 
-    /**
-     * data.params[]:
-     *  [0]: profile: resources.Profile
-     *
-     * @param {RpcRequest} data
-     * @returns {Promise<Bookshelf.Collection<FavoriteItem>>}
-     */
+    public getCommandParamValidationRules(): CommandParamValidationRules {
+        return {
+            params: [
+                new IdValidationRule('profileId', true, this.profileService)
+            ] as ParamValidationRule[]
+        } as CommandParamValidationRules;
+    }
+
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<Bookshelf.Collection<FavoriteItem>> {
         const profile: resources.Profile = data.params[0];
         return await this.favoriteItemService.findAllByProfileId(profile.id);
     }
 
-    /**
-     * data.params[]:
-     *  [0]: profileId
-     *
-     * if data.params[0] is number then find favorites by profileId else find by profile Name
-     *
-     * @param {RpcRequest} data
-     * @returns {Promise<RpcRequest>}
-     */
     public async validate(data: RpcRequest): Promise<RpcRequest> {
-        if (data.params.length < 1) {
-            throw new MissingParamException('profileId');
-        }
-
-        const profileId = data.params[0];
-
-        if (typeof profileId !== 'number') {
-            throw new InvalidParamException('profileId', 'number');
-        }
-
-        // make sure Profile exists
-        const profile: resources.Profile = await this.profileService.findOne(profileId)
-            .then(value => value.toJSON())
-            .catch(reason => {
-                throw new ModelNotFoundException('Profile');
-            });
-
-        data.params[0] = profile;
-
+        await super.validate(data);
         return data;
     }
 
@@ -83,8 +57,7 @@ export class FavoriteListCommand extends BaseCommand implements RpcCommandInterf
 
     public help(): string {
         return this.usage() + ' -  ' + this.description() + '\n'
-            + '    <profileId>                   - [optional]- Numeric - The ID of the profile we \n'
-            + '                                     want to retrive favorites associated with that profile id. \n';
+            + '    <profileId>                   - number - The Profile ID. \n';
     }
 
     public description(): string {

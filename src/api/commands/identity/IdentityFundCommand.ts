@@ -30,7 +30,6 @@ import { RpcBlindSendToOutput } from 'omp-lib/dist/interfaces/rpc';
 import { IdentityType } from '../../enums/IdentityType';
 import { MessageException } from '../../exceptions/MessageException';
 
-
 export interface FundResponse {
     txid?: string;
     fee?: number;
@@ -49,8 +48,7 @@ export class IdentityFundCommand extends BaseCommand implements RpcCommandInterf
     ) {
         super(Commands.IDENTITY_FUND);
         this.log = new Logger(__filename);
-
-        this.debug = true;
+        // this.debug = true;
     }
 
     /**
