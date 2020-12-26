@@ -43,8 +43,6 @@ services:
       - MAINNET_PORT=51738
       - TESTNET_PORT=51935
       - STANDALONE=true
-    cpus: '1.00'
-    mem_limit: '800M'
 
   app2:
     build:
@@ -83,8 +81,6 @@ services:
       - MAINNET_PORT=51738
       - TESTNET_PORT=51935
       - STANDALONE=true
-    cpus: '1.00'
-    mem_limit: '800M'
 
 #  gui1:
 #    image: market-gui
@@ -162,8 +158,6 @@ services:
 #      - CONF_BIND=127.0.0.1             # Bind to given address and always listen on it. Use [host]:port notation for IPv6
 #      - CONF_DEBUG=tor                    # Output debugging information: 0/1, addrman, alert, bench, cmpctblock, coindb, db, http, libevent, lock, mempool, mempoolrej, net, proxy, prune, rand, reindex, rpc, selectcoins, tor, zmq, qt.
       - CREATEDEFAULTMASTERKEY=true
-    cpus: '1.00'
-    mem_limit: '600M'
 
   particld2:
     image: ludx/particl:0.19.1.1
@@ -186,6 +180,4 @@ services:
       - CONF_RPCALLOWIP=0.0.0.0/0       # Allow JSON-RPC connections from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24).
       - CONF_LISTEN=1                   # Accept connections from outside (default: 1 if no -proxy or -connect)
       - CREATEDEFAULTMASTERKEY=true
-    cpus: '1.00'
-    mem_limit: '600M'
 

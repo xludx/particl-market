@@ -318,6 +318,8 @@ export class ListingItemService {
 
         // Comments dont have a hard link to ListinItems
         // TODO: we might not want to delete Comments just yet since the ListingItem might get relisted
+        // TODO: remove comments separately
+        /*
         const listingComments = await this.commentService.findAllByTypeAndTarget(CommentCategory.LISTINGITEM_QUESTION_AND_ANSWERS, listingItem.hash);
         listingComments.forEach((comment) => {
             try {
@@ -328,6 +330,7 @@ export class ListingItemService {
                 this.log.error(error);
             }
         });
+        */
 
         // manually remove Images
         if (!_.isEmpty(listingItem.ItemInformation.Images)) {
@@ -335,7 +338,6 @@ export class ListingItemService {
                 await this.imageService.destroy(image.id);
             }
         }
-        this.log.debug('destroy(), deleting ListingItem:', listingItem.id);
 
         await this.listingItemRepo.destroy(listingItem.id);
     }

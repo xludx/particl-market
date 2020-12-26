@@ -14,14 +14,14 @@ export class ImageData extends Bookshelf.Model<ImageData> {
     ];
 
     public static async fetchAllByImageHashAndVersion(hash: string, version: string, withRelated: boolean = true): Promise<Collection<ImageData>> {
-        const proposalResultCollection = ImageData.forge<Model<ImageData>>()
+        const collection = ImageData.forge<Model<ImageData>>()
             .query(qb => {
-                qb.where('image_hash', '=', hash);
-                qb.andWhere('image_version', '=', version);
+                qb.where('image_hash', hash)
+                    .andWhere('image_version', version);
             })
-            .orderBy('id', SearchOrder.DESC);
+            .orderBy('created_at', SearchOrder.DESC);
 
-        return proposalResultCollection.fetchAll(withRelated ? {withRelated: this.RELATIONS} : undefined);
+        return collection.fetchAll(withRelated ? {withRelated: this.RELATIONS} : undefined);
     }
 
     public static async fetchById(value: number, withRelated: boolean = true): Promise<ImageData> {
