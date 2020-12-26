@@ -30,7 +30,8 @@ export class ExpiredListingItemService extends BaseObserverService {
         for (const listingItem of listingItems) {
             await this.listingItemService.destroy(listingItem.id)
                 .catch(reason => {
-                    this.log.error('Failed to remove expired ListingItem (' + listingItem.hash + ') on Market (' + listingItem.market + '): ', reason);
+                    this.log.error('Failed to remove expired ListingItem (' + listingItem.hash + ') on Market ('
+                        + listingItem.market + '): ' + JSON.stringify(reason, null, 2));
                 });
         }
 

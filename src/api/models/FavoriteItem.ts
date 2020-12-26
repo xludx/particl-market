@@ -32,23 +32,12 @@ export class FavoriteItem extends Bookshelf.Model<FavoriteItem> {
     ];
 
     public static async fetchById(value: number, withRelated: boolean = true): Promise<FavoriteItem> {
-        if (withRelated) {
-            return await FavoriteItem.where<FavoriteItem>({ id: value }).fetch({
-                withRelated: this.RELATIONS
-            });
-        } else {
-            return await FavoriteItem.where<FavoriteItem>({ id: value }).fetch();
-        }
+        return FavoriteItem.where<FavoriteItem>({ id: value }).fetch(withRelated ? {withRelated: this.RELATIONS} : undefined);
     }
 
     public static async fetchByProfileIdAndListingItemId(profileId: number, itemId: number, withRelated: boolean = true): Promise<FavoriteItem> {
-        if (withRelated) {
-            return await FavoriteItem.where<FavoriteItem>({ listing_item_id: itemId, profile_id: profileId }).fetch({
-                withRelated: this.RELATIONS
-            });
-        } else {
-            return await FavoriteItem.where<FavoriteItem>({ listing_item_id: itemId, profile_id: profileId }).fetch();
-        }
+        return FavoriteItem.where<FavoriteItem>({ listing_item_id: itemId, profile_id: profileId })
+            .fetch(withRelated ? {withRelated: this.RELATIONS} : undefined);
     }
 
     public static async fetchFavoritesByProfileId(profileId: number, withRelated: boolean = true): Promise<Collection<FavoriteItem>> {
@@ -57,15 +46,7 @@ export class FavoriteItem extends Bookshelf.Model<FavoriteItem> {
                 qb.where('profile_id', '=', profileId);
             })
             .orderBy('id', 'ASC');
-
-        if (withRelated) {
-            return await favoriteItems.fetchAll({
-                withRelated: this.RELATIONS
-
-            });
-        } else {
-            return await favoriteItems.fetchAll();
-        }
+        return favoriteItems.fetchAll(withRelated ? {withRelated: this.RELATIONS} : undefined);
     }
 
     public get tableName(): string { return 'favorite_items'; }
