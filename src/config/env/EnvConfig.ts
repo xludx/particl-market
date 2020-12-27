@@ -74,7 +74,7 @@ export class EnvConfig {
         LOG_RPC_INCOMING: false,
         LOG_RPC_CALL: false,
         LOG_MPMESSAGE: false
-};
+    };
 
     /**
      * sets the environment configuration.

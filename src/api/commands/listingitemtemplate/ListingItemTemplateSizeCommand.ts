@@ -47,6 +47,8 @@ export class ListingItemTemplateSizeCommand extends BaseCommand implements RpcCo
     /**
      * params[]:
      *  [0]: listingItemTemplateId
+     *  [1]: paidImageMessages (optional, default: false)
+     *
      */
     public getCommandParamValidationRules(): CommandParamValidationRules {
         return {
