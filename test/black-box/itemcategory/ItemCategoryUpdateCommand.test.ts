@@ -182,7 +182,7 @@ describe('ItemCategoryUpdateCommand', () => {
         ]);
         res.expectJson();
         // res.expectStatusCode(400);
-        expect(res.error.error.message).toBe(new InvalidParamException('parentCategoryId', 'number').getMessage());
+        expect(res.error.error.message).toBe(new InvalidParamException('parentItemCategoryId', 'number').getMessage());
     });
 
     test('Should update the ItemCategory with new name, description and parent using id', async () => {

@@ -32,7 +32,7 @@ export class ItemCategoryGetCommand extends BaseCommand implements RpcCommandInt
     public getCommandParamValidationRules(): CommandParamValidationRules {
         return {
             params: [
-                new IdValidationRule('id', true, this.itemCategoryService)
+                new IdValidationRule('itemCategoryId', true, this.itemCategoryService)
             ] as ParamValidationRule[]
         } as CommandParamValidationRules;
     }
