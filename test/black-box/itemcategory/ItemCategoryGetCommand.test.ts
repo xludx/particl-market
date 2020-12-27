@@ -48,7 +48,7 @@ describe('ItemCategoryGetCommand', () => {
         const res = await testUtil.rpc(categoryCommand, [categoryGetCommand]);
         res.expectJson();
         res.expectStatusCode(404);
-        expect(res.error.error.message).toBe(new MissingParamException('categoryId').getMessage());
+        expect(res.error.error.message).toBe(new MissingParamException('itemCategoryId').getMessage());
     });
 
 
@@ -58,7 +58,7 @@ describe('ItemCategoryGetCommand', () => {
         ]);
         res.expectJson();
         res.expectStatusCode(400);
-        expect(res.error.error.message).toBe(new InvalidParamException('categoryId', 'number').getMessage());
+        expect(res.error.error.message).toBe(new InvalidParamException('itemCategoryId', 'number').getMessage());
     });
 
 
