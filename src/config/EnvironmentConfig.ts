@@ -15,11 +15,6 @@ export const envConfig = (): EnvConfig => {
 
     console.log('envConfig(), ...');
 
-    // if (config) {
-    //    console.log('envConfig(), already created...');
-    //    return config;
-    // }
-
     if (Environment.isProduction()) {
         config = new ProductionEnvConfig();
     } else if (Environment.isAlpha()) {
@@ -27,11 +22,11 @@ export const envConfig = (): EnvConfig => {
     } else if (Environment.isDevelopment()) {
         config = new DevelopmentEnvConfig();
     } else if (Environment.isTest()) {
-        config = new TestEnvConfig(process.env.MP_DATA_FOLDER || './data/tests', process.env.MP_DOTENV_FILE || '.env.test');
+        config = new TestEnvConfig(process.env.MP_DATA_FOLDER || './data/tests', process.env.MP_DOTENV_FILE || '.env.test');
     } else if (Environment.isBlackBoxTest()) {
-        config = new TestEnvConfig(process.env.MP_DATA_FOLDER || './data', process.env.MP_DOTENV_FILE || '.env.blackbox');
+        config = new TestEnvConfig(process.env.MP_DATA_FOLDER || './data', process.env.MP_DOTENV_FILE || '.env.blackbox');
     } else {
-        config = new EnvConfig(process.env.MP_DATA_FOLDER || './data', process.env.MP_DOTENV_FILE || '.env');
+        config = new EnvConfig(process.env.MP_DATA_FOLDER || './data', process.env.MP_DOTENV_FILE || '.env');
     }
     return config;
 };

@@ -4,6 +4,7 @@
 
 import * from 'jest';
 import * as resources from 'resources';
+import { envConfig } from '../../../src/config/EnvironmentConfig';
 import { BlackBoxTestUtil } from '../lib/BlackBoxTestUtil';
 import { Commands } from '../../../src/api/commands/CommandEnumType';
 import { CreatableModel } from '../../../src/api/enums/CreatableModel';
@@ -14,6 +15,7 @@ import { MissingParamException } from '../../../src/api/exceptions/MissingParamE
 import { InvalidParamException } from '../../../src/api/exceptions/InvalidParamException';
 import { CoreMessageVersion } from '../../../src/api/enums/CoreMessageVersion';
 import { ProtocolDSN } from 'omp-lib/dist/interfaces/dsn';
+import { EnvironmentType } from '../../../src/core/helpers/Environment';
 
 
 describe('ListingItemTemplateSizeCommand', () => {
@@ -31,6 +33,7 @@ describe('ListingItemTemplateSizeCommand', () => {
     const imageCommand = Commands.IMAGE_ROOT.commandName;
     const imageAddCommand = Commands.IMAGE_ADD.commandName;
 
+    const SMSG_MAX_MSG_BYTES_PAID: number = 512 * 1024;
     let profile: resources.Profile;
     let market: resources.Market;
 
@@ -99,7 +102,7 @@ describe('ListingItemTemplateSizeCommand', () => {
         const result: MessageSize = res.getBody()['result'];
         expect(result.messageVersion).toBe(CoreMessageVersion.PAID);
         expect(result.size).toBeGreaterThan(0);
-        expect(result.maxSize).toBe(process.env.SMSG_MAX_MSG_BYTES_PAID);
+        expect(result.maxSize).toBe(SMSG_MAX_MSG_BYTES_PAID);
         expect(result.spaceLeft).toBeGreaterThan(0);
         expect(result.fits).toBe(true);
         expect(result.identifier).toBe(listingItemTemplate.id);
@@ -119,7 +122,7 @@ describe('ListingItemTemplateSizeCommand', () => {
         log.debug('MessageSize: ', JSON.stringify(result, null, 2));
         expect(result.messageVersion).toBe(CoreMessageVersion.PAID);
         expect(result.size).toBeGreaterThan(0);
-        expect(result.maxSize).toBe(process.env.SMSG_MAX_MSG_BYTES_PAID);
+        expect(result.maxSize).toBe(SMSG_MAX_MSG_BYTES_PAID);
         expect(result.spaceLeft).toBeGreaterThan(0);
         expect(result.fits).toBe(true);
         expect(result.identifier).toBe(listingItemTemplate.id);
