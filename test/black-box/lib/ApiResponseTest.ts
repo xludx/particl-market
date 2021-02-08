@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 
 export class ApiResponseTest {
 
-    constructor(private error: any, private res: any) {
+    constructor(public error: any, public res: any) {
     }
 
     public getBody<T>(): T {

@@ -110,7 +110,6 @@ export class MarketFlagCommand extends BaseCommand implements RpcCommandInterfac
         smsgSendResponse.childResults = await this.voteActionService.vote(voteRequest);
 
         return smsgSendResponse;
-
     }
 
     /**
