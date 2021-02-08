@@ -83,7 +83,7 @@ export class ProposalResultRecalcService extends BaseObserverService {
             hasFinalResult: false
         } as ProposalSearchParams).then(value => value.toJSON());
 
-        // const newBlacklists: resources.Blacklist[] = [];
+        const newBlacklists: resources.Blacklist[] = [];
         for (const proposal of expiredProposals) {
             // calculate the final ProposalResult
             const proposalResult = await this.proposalService.recalculateProposalResult(proposal);
@@ -91,14 +91,14 @@ export class ProposalResultRecalcService extends BaseObserverService {
 
             for (const flaggedItem of proposal.FlaggedItems) {
                 const blacklist = await this.addBlacklistAndRemoveFlagged(flaggedItem.id, proposalResult);
-                // if (blacklist) {
-                //    newBlacklists.push(blacklist);
-                // }
+                if (blacklist) {
+                    newBlacklists.push(blacklist);
+                }
             }
         }
 
-        // this.log.debug('process(), activeProposals: ' + activeProposals.length + ', expiredProposals: ' + expiredProposals.length
-        //    + ', newBlacklists: ' + newBlacklists.length);
+        this.log.debug('process(), activeProposals: ' + activeProposals.length + ', expiredProposals: ' + expiredProposals.length
+            + ', newBlacklists: ' + newBlacklists.length);
 
         return ObserverStatus.RUNNING;
     }

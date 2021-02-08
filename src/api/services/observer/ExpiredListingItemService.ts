@@ -27,6 +27,7 @@ export class ExpiredListingItemService extends BaseObserverService {
     public async run(currentStatus: ObserverStatus): Promise<ObserverStatus> {
 
         const listingItems: resources.ListingItem[] = await this.listingItemService.findAllExpired().then(value => value.toJSON());
+        // todo: skip favorites and the ones in cart
         for (const listingItem of listingItems) {
             await this.listingItemService.destroy(listingItem.id)
                 .catch(reason => {

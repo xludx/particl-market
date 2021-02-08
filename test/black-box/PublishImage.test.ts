@@ -11,18 +11,17 @@ import { ImageProcessing } from '../../src/core/helpers/ImageProcessing';
 import { Logger as LoggerType } from '../../src/core/Logger';
 import { GenerateListingItemTemplateParams } from '../../src/api/requests/testdata/GenerateListingItemTemplateParams';
 import { ImageVersions } from '../../src/core/helpers/ImageVersionEnumType';
+import {ApiResponseTest} from "./lib/ApiResponseTest";
 
 describe('/images', () => {
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = process.env.JASMINE_TIMEOUT;
 
     const log: LoggerType = new LoggerType(__filename);
-    const testUtil = new BlackBoxTestUtil(0);
-    const testUtil2 = new BlackBoxTestUtil(1);
 
-    // todo:
-    // const randomBoolean: boolean = Math.random() >= 0.5;
-    // const testUtil = new BlackBoxTestUtil(randomBoolean ? 0 : 1);
+    const randomBoolean: boolean = Math.random() >= 0.5;
+    const testUtil = new BlackBoxTestUtil(randomBoolean ? 0 : 1);
+    const testUtilBuyerNode = new BlackBoxTestUtil(randomBoolean ? 1 : 0);
 
     let market: resources.Market;
     let profile: resources.Profile;
@@ -30,18 +29,16 @@ describe('/images', () => {
     let listingItemTemplate: resources.ListingItemTemplate;
     const httpOptions = {
         host: 'http://' + process.env.RPCHOSTNAME,
-        port: 3100
+        port: 45592
     };
 
     beforeAll(async () => {
         await testUtil.cleanDb();
-        await testUtil2.cleanDb();
 
         profile = await testUtil.getDefaultProfile();
         expect(profile.id).toBeDefined();
         market = await testUtil.getDefaultMarket(profile.id);
         expect(market.id).toBeDefined();
-
 
         // generate ListingItemTemplate
         const generateListingItemTemplateParams = new GenerateListingItemTemplateParams([
@@ -73,8 +70,8 @@ describe('/images', () => {
     test('GET  /images/:itemImageId/:imageVersion        Should load Image, version: LARGE', async () => {
         const itemImageId = listingItemTemplate.ItemInformation.Images[0].id;
         const imageVersion = ImageVersions.LARGE.propName;
-        log.debug('call:' + `/api/images/${itemImageId}/${imageVersion}`);
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+
         res.expectStatusCode(200);
     });
 
@@ -82,7 +79,7 @@ describe('/images', () => {
         const itemImageId = listingItemTemplate.ItemInformation.Images[0].id;
         const imageVersion = ImageVersions.MEDIUM.propName;
         log.debug('call:' + `/api/images/${itemImageId}/${imageVersion}`);
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
         res.expectStatusCode(200);
     });
 
@@ -90,7 +87,7 @@ describe('/images', () => {
         const itemImageId = listingItemTemplate.ItemInformation.Images[0].id;
         const imageVersion = ImageVersions.THUMBNAIL.propName;
         log.debug('call:' + `/api/images/${itemImageId}/${imageVersion}`);
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
         res.expectStatusCode(200);
     });
 
@@ -98,7 +95,7 @@ describe('/images', () => {
         const itemImageId = listingItemTemplate.ItemInformation.Images[0].id;
         const imageVersion = ImageVersions.ORIGINAL.propName;
         log.debug('call:' + `/api/images/${itemImageId}/${imageVersion}`);
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
         res.expectStatusCode(200);
     });
 
@@ -106,7 +103,7 @@ describe('/images', () => {
         const itemImageId = 0;
         const imageVersion = ImageVersions.LARGE.propName;
         log.debug('call:' + `/api/images/${itemImageId}/${imageVersion}`);
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
         res.expectStatusCode(404);
         expect(res.error.error.message).toBe('Entity with identifier ' + itemImageId + ' does not exist');
     });
@@ -114,7 +111,7 @@ describe('/images', () => {
     test('GET  /images/:itemImageId/:imageVersion        Should fail to load Image because of invalid imageVersion', async () => {
         const itemImageId = listingItemTemplate.ItemInformation.Images[0].id;
         const imageVersion = 'INVALID_IMAGE:VERSION';
-        const res = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
+        const res: ApiResponseTest = await api('GET', `/api/images/${itemImageId}/${imageVersion}`, httpOptions);
         res.expectStatusCode(404);
         expect(res.error.error.message).toBe('Image not found!');
     });
@@ -123,7 +120,7 @@ describe('/images', () => {
         // expect.assertions(14); // 2 [basic expects] + 4 [image types] * 3 [expects in the loop]
 
         const auth = 'Basic ' + Buffer.from(process.env.RPCUSER + ':' + process.env.RPCPASSWORD).toString('base64');
-        const res: any = await api('POST', `/api/images/template/${listingItemTemplate.id}`, {
+        const res: ApiResponseTest = await api('POST', `/api/images/template/${listingItemTemplate.id}`, {
             host: httpOptions.host,
             port: httpOptions.port,
             headers: {
@@ -164,7 +161,7 @@ describe('/images', () => {
         // expect.assertions(26); // 2 [basic expects] + 2 [images] * 4 [image types] * 3 [expects in the loop]
 
         const auth = 'Basic ' + Buffer.from(process.env.RPCUSER + ':' + process.env.RPCPASSWORD).toString('base64');
-        const res: any = await api('POST', `/api/images/template/${listingItemTemplate.id}`, {
+        const res: ApiResponseTest = await api('POST', `/api/images/template/${listingItemTemplate.id}`, {
             host: httpOptions.host,
             port: httpOptions.port,
             headers: {

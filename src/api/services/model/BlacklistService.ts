@@ -63,16 +63,10 @@ export class BlacklistService {
 
     @validate()
     public async create(@request(BlacklistCreateRequest) data: BlacklistCreateRequest): Promise<Blacklist> {
-
         const body = JSON.parse(JSON.stringify(data));
         // this.log.debug('create Blacklist, body: ', JSON.stringify(body, null, 2));
-
-        // If the request body was valid we will create the blacklist
         const blacklist = await this.blacklistRepo.create(body);
-
-        // finally find and return the created blacklist
-        const newBlacklist = await this.findOne(blacklist.id);
-        return newBlacklist;
+        return await this.findOne(blacklist.id);
     }
 
     @validate()
@@ -152,9 +146,6 @@ export class BlacklistService {
                 await this.destroy(blacklist.id);
             }
         }
-
         return blacklisted;
     }
-
-
 }

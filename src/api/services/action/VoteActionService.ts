@@ -113,7 +113,6 @@ export class VoteActionService extends BaseActionService {
         return marketplaceMessage;
     }
 
-
     /**
      * called after post is executed and message is sent
      *
@@ -164,8 +163,7 @@ export class VoteActionService extends BaseActionService {
         }
 
         if (voteRequest.proposal.category !== ProposalCategory.PUBLIC_VOTE) {
-            await this.setRemovedFlags(voteRequest); // todo: remove, sets the removed on ListingItem or Market
-            await this.blacklistService.updateBlacklistsByVote(voteRequest);
+            await this.setRemovedFlags(voteRequest);
         }
 
         return smsgSendResponses;
@@ -246,11 +244,7 @@ export class VoteActionService extends BaseActionService {
 
         // after recalculating the ProposalResult, we can now update the removed flags for flaggedItems
         for (const flaggedItem of proposal.FlaggedItems) {
-
-            // todo: remove, sets the removed on ListingItem or Market, replaced by blacklisting
             await this.flaggedItemService.setRemovedFlagIfNeeded(flaggedItem.id, proposalResult, vote);
-
-            // blacklists will be updated when the
         }
 
         return smsgMessage;
@@ -310,7 +304,6 @@ export class VoteActionService extends BaseActionService {
 
     /**
      * update the removed flags based on proposal category, user is voting, so set the flag based on the vote
-     * todo: remove this, should be replaced with blacklist
      *
      * @param voteRequest
      */
