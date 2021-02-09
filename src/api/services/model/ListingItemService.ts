@@ -308,6 +308,7 @@ export class ListingItemService {
 
         const listingItem: resources.ListingItem = await this.findOne(id, true).then(value => value.toJSON());
 
+        // skip if listingItem has Bids, FavoriteItems or ShoppingCartItems
         if (!_.isEmpty(listingItem.Bids)
             || !_.isEmpty(listingItem.FavoriteItems)
             || !_.isEmpty(listingItem.ShoppingCartItem)) {
