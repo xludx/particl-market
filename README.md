@@ -46,6 +46,47 @@ Then copy the `.env.example` file and rename it to `.env`. In this file you can 
 cp .env.example .env
 ```
 
+Download and install particl-core, then run it with a particl.conf like this:
+```
+testnet=1
+staking=1
+
+[test]
+wallet=market
+server=1
+rpcauth=test:1115cff319dd95bc85694eaee524cb3$db9ff1eb00be80c151709c92a7f460b8a97d95efaefc1bd68e65a50ed921f615
+rpccookiefile=.cookie
+rpcport=51935
+rpccorsdomain=http://localhost:4300
+rpcallowip=0.0.0.0/0
+rpcbind=0.0.0.0
+rpcworkqueue=500
+rpcthreads=128
+rpctimeout=1000
+addnode=particld1
+addnode=particld2
+addnode=190.38.84.89:51938
+addnode=62.248.139.50:51738
+addnode=172.18.0.4
+addnode=172.18.0.5
+addnode=104.248.38.233
+whitelist=172.18.0.0/24
+
+txindex=1
+addressindex=1
+
+debug=smsg
+printtoconsole=0
+debuglogfile=debug.log # | 0
+
+walletrejectlongchains=true
+zmqpubsmsg=tcp://*:54235
+zmqpubrawblock=tcp://*:54235
+zmqpubrawtx=tcp://*:54235
+zmqpubhashtx=tcp://*:54235
+zmqpubhashblock=tcp://*:54235
+```
+
 Then setup your application environment.
 ```
 npm run setup
@@ -79,11 +120,15 @@ Find the `particl.conf` files and set printtoconsole=0.
 ### Step 3: Serve your App
 Go to the project dir and start your app with this npm script.
 ```
-npm run serve
+yarn serve
 ```
 
 > This starts a local server using `nodemon`, which will watch for any file changes and will restart the server according to these changes.
 > The server address will be displayed to you as `http://0.0.0.0:3000`.
+> market rpc: http://localhost:3100/api/rpc
+> market cli: http://localhost:3100/cli
+> particl-core rpc: localhost:51935
+> see src/api/commands for all the possible rpc commands.
 
 
 ### Step 3b: Or serve your App using Docker
@@ -96,8 +141,8 @@ docker-compose up
 Building and running everything and downloading the blockchain for the first time might take some time. 
 
 > This starts two marketplace applications and two particl daemons for you.
-> app1 cli: http://localhost:3100/cli, connecting to particl1 on port 52935
-> app2 cli: http://localhost:3200/cli, connecting to particl2 on port 53935
+> app1 rpc: http://localhost:3100/api/rpc, cli: http://localhost:3100/cli, connecting to particl1 on port 52935
+> app2 rpc: http://localhost:3200/api/rpc, cli: http://localhost:3200/cli, connecting to particl2 on port 53935
 
 ## Scripts / Tasks
 All script are defined in the package.json file, but the most important ones are listed here.
