@@ -74,6 +74,8 @@ cd ..
 git clone git@github.com:xludx/particl-market-data.git
 ```
 
+Find the `particl.conf` files and set printtoconsole=0. 
+
 ### Step 3: Serve your App
 Go to the project dir and start your app with this npm script.
 ```
