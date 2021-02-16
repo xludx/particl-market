@@ -31,14 +31,20 @@ Then install yarn globally
 npm install yarn -g 
 ```
 
-And finally install Docker
+And finally install Docker and docker-compose
 * Installation instructions on [docs.docker.com](https://docs.docker.com/engine/installation/)
 
 
 ### Step 2: Set up the Project
 Fork this project. 
+```
+git clone git@github.com:xludx/particl-market.git
+```
 
 Then copy the `.env.example` file and rename it to `.env`. In this file you can edit your database connection information among other stuff, but everything should really work out of the box.
+```
+cp .env.example .env
+```
 
 Then setup your application environment.
 ```
@@ -46,6 +52,28 @@ npm run setup
 ```
 
 > This installs all dependencies with yarn. After that it migrates the database and seeds some test data into it. So after that your development environment is ready to use.
+
+### Step 2b: Set up the Project to run using docker
+
+Create the needed `.env` files. 
+```
+cp .env.example .env
+cp .env.docker-compose .env.docker-compose.app1
+cp .env.docker-compose .env.docker-compose.app2
+```
+
+If you want to use a specific wallet as the Profile wallet, in the app1 and/or app2 .env files, set:
+```
+# DEFAULT_PROFILE_MNEMONIC=
+# DEFAULT_PROFILE_PASSPHRASE=
+```
+
+Create data folders for the particl-market's and particld's. You can pull it from `git@github.com:xludx/particl-market-data.git`. Make sure it's located in the same folder as particl-market.
+```
+cd ..
+git clone git@github.com:xludx/particl-market-data.git
+```
+
 
 ### Step 3: Serve your App
 Go to the project dir and start your app with this npm script.
@@ -63,6 +91,8 @@ Build the docker image defined in Dockerfile and start the services.
 docker-compose build
 docker-compose up
 ```
+
+Building and running everything and downloading the blockchain for the first time might take some time. 
 
 > This starts two marketplace applications and two particl daemons for you.
 > app1 cli: http://localhost:3100/cli, connecting to particl1 on port 52935
