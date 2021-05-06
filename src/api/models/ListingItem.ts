@@ -111,8 +111,15 @@ export class ListingItem extends Bookshelf.Model<ListingItem> {
             .query(qb => {
                 qb.joinRaw(`LEFT JOIN (SELECT listing_item_id, COUNT(*) AS bid_totals FROM bids GROUP BY listing_item_id) bid_totals
                     ON bid_totals.listing_item_id = listing_items.id`);
+                qb.joinRaw(`LEFT JOIN (
+                        SELECT DISTINCT listing_item_id AS cart_item_id, COUNT(listing_item_id) AS cart_item_count
+                        FROM shopping_cart_items
+                        GROUP BY listing_item_id
+                    ) cart_totals
+                    ON cart_totals.cart_item_id = listing_items.id`);
                 qb.where('expired_at', '<=', Date.now());
                 qb.andWhereRaw('bid_totals.bid_totals IS NULL');
+                qb.andWhereRaw('cart_totals.cart_item_count IS NULL');
                 qb.groupBy('listing_items.id');
             });
         return listingCollection.fetchAll();
