@@ -198,7 +198,7 @@ export class DefaultItemCategoryService {
             }
         ];
 
-        this.processCategories([ROOT], categories, market);
+        await this.processCategories([ROOT], categories, market);
 
         this.log.debug('Default categories updated!');
     }
