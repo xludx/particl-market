@@ -214,7 +214,7 @@ export class DefaultItemCategoryService {
             );
 
             if (cat.subCategories) {
-                this.processCategories([...parents, createCategory], cat.subCategories, market);
+                await this.processCategories([...parents, createCategory], cat.subCategories, market);
             }
         }
     }
