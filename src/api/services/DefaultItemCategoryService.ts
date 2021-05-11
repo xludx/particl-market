@@ -13,7 +13,7 @@ import { ItemCategoryCreateRequest } from '../requests/model/ItemCategoryCreateR
 interface CategoryItems {
     name: string;
     description?: string;
-    subCategories?: CategoryItems[]
+    subCategories?: CategoryItems[];
 }
 
 export class DefaultItemCategoryService {
@@ -34,7 +34,9 @@ export class DefaultItemCategoryService {
     public async seedDefaultCategories(market?: string): Promise<void> {
 
         // this.log.debug('seedDefaultCategories(), market: ', market);
-        const ROOT: resources.ItemCategory = await this.itemCategoryService.insertOrUpdateCategory( { name: 'ROOT', description: 'root item category', market } as ItemCategoryCreateRequest);
+        const ROOT: resources.ItemCategory = await this.itemCategoryService.insertOrUpdateCategory(
+            { name: 'ROOT', description: 'root item category', market } as ItemCategoryCreateRequest
+        );
 
         const categories: CategoryItems[] = [
             {
@@ -44,7 +46,7 @@ export class DefaultItemCategoryService {
                     { name: 'Women' },
                     { name: 'Children' },
                     { name: 'Accessories' },
-                    { name: 'Other Apparel' },
+                    { name: 'Other Apparel' }
                 ]
             },
 
@@ -56,12 +58,12 @@ export class DefaultItemCategoryService {
                     { name: 'Linux' },
                     { name: 'Games' },
                     { name: 'Mobile' },
-                    { name: 'Other Software' },
+                    { name: 'Other Software' }
                 ]
             },
 
             {
-                name: 'Automotive & Machinery',
+                name: 'Automotive & Machinery'
             },
 
             {
@@ -71,7 +73,7 @@ export class DefaultItemCategoryService {
                     { name: 'E-Books' },
                     { name: 'Music' },
                     { name: 'Movies and Entertainment' },
-                    { name: 'Other Media' },
+                    { name: 'Other Media' }
                 ]
             },
 
@@ -81,7 +83,7 @@ export class DefaultItemCategoryService {
                     { name: 'Accessories' },
                     { name: 'Phones' },
                     { name: 'Tablets and Ebook Readers' },
-                    { name: 'Other Mobile Devices' },
+                    { name: 'Other Mobile Devices' }
                 ]
             },
 
@@ -97,7 +99,7 @@ export class DefaultItemCategoryService {
                     { name: 'Computer Accessories' },
                     { name: 'Gaming & Consoles' },
                     { name: 'Smart Devices' },
-                    { name: 'Misc. Electronics' },
+                    { name: 'Misc. Electronics' }
                 ]
             },
 
@@ -112,9 +114,9 @@ export class DefaultItemCategoryService {
                         name: 'Beverages',
                         subCategories: [
                             { name: 'Non-alcoholic'},
-                            { name: 'Alcoholic'},
+                            { name: 'Alcoholic'}
                         ]
-                    },
+                    }
                 ]
             },
 
@@ -126,7 +128,7 @@ export class DefaultItemCategoryService {
                     { name: 'Beauty Products' },
                     { name: 'Baby & Infant Care' },
                     { name: 'Vitamins & Supplements' },
-                    { name: 'Misc Health & Beauty' },
+                    { name: 'Misc Health & Beauty' }
                 ]
             },
 
@@ -140,7 +142,7 @@ export class DefaultItemCategoryService {
                     { name: 'Pet Supplies' },
                     { name: 'Garden' },
                     { name: 'DIY Equipment' },
-                    { name: 'Misc. Home Products'},
+                    { name: 'Misc. Home Products'}
                 ]
             },
 
@@ -152,16 +154,16 @@ export class DefaultItemCategoryService {
                     { name: 'Retail Equipment & Supplies' },
                     { name: 'Building Materials & Supplies' },
                     { name: 'Hardware' },
-                    { name: 'Restuarant & Food Equipment' },
+                    { name: 'Restuarant & Food Equipment' }
                 ]
             },
 
             {
-                name: 'Sports & Outdoors',
+                name: 'Sports & Outdoors'
             },
 
             {
-                name: 'Games & Toys',
+                name: 'Games & Toys'
             },
 
             {
@@ -170,7 +172,7 @@ export class DefaultItemCategoryService {
                     { name: 'Vouchers & Gift Cards' },
                     { name: 'Creative' },
                     { name: 'Legal' },
-                    { name: 'Other Services' },
+                    { name: 'Other Services' }
                 ]
             },
 
@@ -180,7 +182,7 @@ export class DefaultItemCategoryService {
                     { name: 'Merchandise & Swag' },
                     { name: 'OTC Trading' },
                     { name: 'Wallets' },
-                    { name: 'Other Crypto' },
+                    { name: 'Other Crypto' }
                 ]
             },
 
@@ -191,9 +193,9 @@ export class DefaultItemCategoryService {
                     { name: 'Sports Cards' },
                     { name: 'Trading Card Games (TCG)' },
                     { name: 'Coins' },
-                    { name: 'Other Collectibles' },
+                    { name: 'Other Collectibles' }
                 ]
-            },
+            }
         ];
 
         this.processCategories([ROOT], categories, market);
@@ -202,12 +204,14 @@ export class DefaultItemCategoryService {
     }
 
     private async processCategories(parents: resources.ItemCategory[], categoryItems: CategoryItems[] = [], market?: string): Promise<void> {
-        for(const cat of categoryItems) {
+        for (const cat of categoryItems) {
             if (!cat.name) {
                 continue;
             }
             const description = typeof cat.description === 'string' ? cat.description : '';
-            const createCategory = await this.itemCategoryService.insertOrUpdateCategory({ name: cat.name, description: description, market } as ItemCategoryCreateRequest, parents);
+            const createCategory = await this.itemCategoryService.insertOrUpdateCategory(
+                { name: cat.name, description, market } as ItemCategoryCreateRequest, parents
+            );
 
             if (cat.subCategories) {
                 this.processCategories([...parents, createCategory], cat.subCategories, market);
