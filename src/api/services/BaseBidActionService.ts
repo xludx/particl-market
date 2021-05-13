@@ -12,6 +12,8 @@ import { Logger as LoggerType } from '../../core/Logger';
 import { ActionMessageValidatorInterface } from '../messagevalidators/ActionMessageValidatorInterface';
 import { NotifyService } from './NotifyService';
 import { ActionMessageTypes } from '../enums/ActionMessageTypes';
+import { ActionMessageObjects } from './../enums/ActionMessageObjects';
+import { KVS } from 'omp-lib/dist/interfaces/common';
 import { BaseActionService } from './BaseActionService';
 import { BidCreateRequest } from '../requests/model/BidCreateRequest';
 import { ListingItemService } from './model/ListingItemService';
@@ -98,11 +100,16 @@ export abstract class BaseBidActionService extends BaseActionService {
             .then(value => value.toJSON());
 
         if (bid) {
+            const orderHash = _.find(Array.isArray(bid.BidDatas) ? bid.BidDatas : [], (kvs: KVS) => {
+                return kvs.key === ActionMessageObjects.ORDER_HASH;
+            });
+
             return {
                 event: marketplaceMessage.action.type,
                 payload: {
                     objectId: bid.id,
                     objectHash: bid.hash,
+                    orderHash: orderHash ? orderHash.value : '',
                     from: smsgMessage.from,
                     to: smsgMessage.to,
                     target: bid.ListingItem.hash,

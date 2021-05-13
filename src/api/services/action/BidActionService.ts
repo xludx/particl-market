@@ -232,11 +232,16 @@ export class BidActionService extends BaseActionService {
                 .then(value => value.toJSON());
 
             if (bid) {
+                const orderHash = _.find(Array.isArray(bid.BidDatas) ? bid.BidDatas : [], (kvs: KVS) => {
+                    return kvs.key === ActionMessageObjects.ORDER_HASH;
+                });
+
                 return {
                     event: marketplaceMessage.action.type,
                     payload: {
                         objectId: bid.id,
                         objectHash: bid.hash,
+                        orderHash: orderHash ? orderHash.value : '',
                         from: bid.bidder,
                         to: bid.OrderItem.Order.seller,
                         target: bid.ListingItem.hash,
