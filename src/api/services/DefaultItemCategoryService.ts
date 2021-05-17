@@ -128,7 +128,7 @@ export class DefaultItemCategoryService {
                     { name: 'Beauty Products' },
                     { name: 'Baby & Infant Care' },
                     { name: 'Vitamins & Supplements' },
-                    { name: 'Misc Health & Beauty' }
+                    { name: 'Misc. Health & Beauty' }
                 ]
             },
 
@@ -137,6 +137,7 @@ export class DefaultItemCategoryService {
                 subCategories: [
                     { name: 'Furniture' },
                     { name: 'Appliances' },
+                    { name: 'Kitchenware' },
                     { name: 'Decor' },
                     { name: 'Hardware & Tools' },
                     { name: 'Pet Supplies' },
@@ -154,7 +155,7 @@ export class DefaultItemCategoryService {
                     { name: 'Retail Equipment & Supplies' },
                     { name: 'Building Materials & Supplies' },
                     { name: 'Hardware' },
-                    { name: 'Restuarant & Food Equipment' }
+                    { name: 'Restaurant & Food Equipment' }
                 ]
             },
 
@@ -181,6 +182,7 @@ export class DefaultItemCategoryService {
                 subCategories: [
                     { name: 'Merchandise & Swag' },
                     { name: 'OTC Trading' },
+                    { name: 'NFT' },
                     { name: 'Wallets' },
                     { name: 'Other Crypto' }
                 ]
