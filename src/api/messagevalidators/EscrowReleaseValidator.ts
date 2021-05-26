@@ -55,7 +55,7 @@ export class EscrowReleaseValidator implements ActionMessageValidatorInterface {
                     return child.type === MPActionExtended.MPA_SHIP;
                 });
 
-                return completeBid !== undefined && shipBid !== undefined;
+                return (completeBid !== undefined) || (shipBid !== undefined);
             })
             .catch( () => false);
     }
