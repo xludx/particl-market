@@ -36,6 +36,7 @@ import { NotifyService } from '../NotifyService';
 import { MarketplaceNotification } from '../../messages/MarketplaceNotification';
 import { EscrowLockMessageFactory } from '../../factories/message/EscrowLockMessageFactory';
 import { BlacklistService } from '../model/BlacklistService';
+import { MessageException } from '../../exceptions/MessageException';
 
 
 export class EscrowLockActionService extends BaseBidActionService {
@@ -153,6 +154,19 @@ export class EscrowLockActionService extends BaseBidActionService {
             .then(async value => {
                 const bid: resources.Bid = value.toJSON();
 
+                const nextOrderStatus = OrderItemStatus.ESCROW_LOCKED;
+
+                const isValid = bid.ParentBid.OrderItem.status && this.orderItemService.isNextStatusValid(
+                    bid.ParentBid.OrderItem.status,
+                    nextOrderStatus
+                );
+
+                if (!isValid) {
+                    throw new MessageException(
+                        `Invalid orderitem sequence for orderitem id ${bid.ParentBid.OrderItem.id}: ${bid.ParentBid.OrderItem.status} -> ${nextOrderStatus}`
+                    );
+                }
+
                 // mp@0.1.7: because of a bug in smsg, some messages might not have been received and 'smsg resend'-command was added to allow resending
                 // those smsgmessages to fix the buy flow. it was possible for buyers to not receive the MPA_COMPLETE, but receive the next MPA_SHIP which
                 // the seller sends after the MPA_COMPLETE. Now, if seller resends the MPA_COMPLETE after MPA_SHIP has been received, the Order and OrderItem
@@ -162,7 +176,7 @@ export class EscrowLockActionService extends BaseBidActionService {
                 // to fix this, update the statuses only if they are in the expected previous state set by MPA_ACCEPT (AWAITING_ESCROW)
                 if (bid.ParentBid.OrderItem.status === OrderItemStatus.AWAITING_ESCROW
                     && bid.ParentBid.OrderItem.Order.status === OrderStatus.PROCESSING) {
-                    await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, OrderItemStatus.ESCROW_LOCKED);
+                    await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, nextOrderStatus);
                     await this.orderService.updateStatus(bid.ParentBid.OrderItem.Order.id, OrderStatus.PROCESSING);
                 }
 

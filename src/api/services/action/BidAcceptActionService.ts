@@ -33,6 +33,7 @@ import { BaseBidActionService } from '../BaseBidActionService';
 import { ListingItemService } from '../model/ListingItemService';
 import { BidAcceptMessageFactory } from '../../factories/message/BidAcceptMessageFactory';
 import { BlacklistService } from '../model/BlacklistService';
+import { MessageException } from '../../exceptions/MessageException';
 
 
 export class BidAcceptActionService extends BaseBidActionService {
@@ -133,9 +134,22 @@ export class BidAcceptActionService extends BaseBidActionService {
         await this.bidService.create(bidCreateRequest)
             .then(async value => {
                 const bid: resources.Bid = value.toJSON();
-
                 // this.log.debug('processMessage(), bid: ', JSON.stringify(bid, null, 2));
-                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, OrderItemStatus.AWAITING_ESCROW);
+
+                const nextOrderStatus = OrderItemStatus.AWAITING_ESCROW;
+
+                const isValid = bid.ParentBid.OrderItem.status && this.orderItemService.isNextStatusValid(
+                    bid.ParentBid.OrderItem.status,
+                    nextOrderStatus
+                );
+
+                if (!isValid) {
+                    throw new MessageException(
+                        `Invalid orderitem sequence for orderitem id ${bid.ParentBid.OrderItem.id}: ${bid.ParentBid.OrderItem.status} -> ${nextOrderStatus}`
+                    );
+                }
+
+                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, nextOrderStatus);
                 await this.orderService.updateStatus(bid.ParentBid.OrderItem.Order.id, OrderStatus.PROCESSING);
 
                 return await this.bidService.findOne(bid.id, true).then(bidModel => bidModel.toJSON());

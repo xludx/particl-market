@@ -31,6 +31,7 @@ import { ActionDirection } from '../../enums/ActionDirection';
 import { MarketplaceNotification } from '../../messages/MarketplaceNotification';
 import { BidCreateRequest } from '../../requests/model/BidCreateRequest';
 import { BlacklistService } from '../model/BlacklistService';
+import { MessageException } from '../../exceptions/MessageException';
 
 export class BidCancelActionService extends BaseBidActionService {
 
@@ -125,7 +126,20 @@ export class BidCancelActionService extends BaseBidActionService {
             .then(async value => {
                 const bid: resources.Bid = value.toJSON();
 
-                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, OrderItemStatus.BID_CANCELLED);
+                const nextOrderStatus = OrderItemStatus.BID_CANCELLED;
+
+                const isValid = bid.ParentBid.OrderItem.status && this.orderItemService.isNextStatusValid(
+                    bid.ParentBid.OrderItem.status,
+                    nextOrderStatus
+                );
+
+                if (!isValid) {
+                    throw new MessageException(
+                        `Invalid orderitem sequence for orderitem id ${bid.ParentBid.OrderItem.id}: ${bid.ParentBid.OrderItem.status} -> ${nextOrderStatus}`
+                    );
+                }
+
+                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, nextOrderStatus);
                 await this.orderService.updateStatus(bid.ParentBid.OrderItem.Order.id, OrderStatus.CANCELED);
 
                 await this.bidService.unlockBidOutputs(bid);
