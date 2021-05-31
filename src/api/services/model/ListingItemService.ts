@@ -67,6 +67,19 @@ export class ListingItemService {
         return await this.listingItemRepo.findAllByHash(hash, withRelated);
     }
 
+    /**
+     *
+     * @param {string} hash
+     * @param marketReceiveAddress
+     * @param {boolean} withRelated
+     * @returns {Promise<Bookshelf.Collection<ListingItem>>}
+     */
+     public async findAllByHashAndMarketReceiveAddress(
+        hash: string, marketReceiveAddress: string, withRelated: boolean = true
+    ): Promise<Bookshelf.Collection<ListingItem>> {
+        return await this.listingItemRepo.findAllByHashAndMarketReceiveAddress(hash, marketReceiveAddress, withRelated);
+    }
+
     public async findOne(id: number, withRelated: boolean = true): Promise<ListingItem> {
         const listingItem = await this.listingItemRepo.findOne(id, withRelated);
         if (listingItem === null) {
