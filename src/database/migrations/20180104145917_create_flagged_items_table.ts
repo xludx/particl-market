@@ -22,7 +22,7 @@ exports.up = (db: Knex): Promise<any> => {
 
             table.integer('market_id').unsigned().nullable();
             table.foreign('market_id').references('id')
-                .inTable('markets');
+                .inTable('markets').onDelete('CASCADE');
 
             table.timestamp('updated_at').defaultTo(db.fn.now());
             table.timestamp('created_at').defaultTo(db.fn.now());
