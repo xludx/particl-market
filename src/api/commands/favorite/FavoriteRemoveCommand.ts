@@ -39,7 +39,8 @@ export class FavoriteRemoveCommand extends BaseCommand implements RpcCommandInte
 
     @validate()
     public async execute( @request(RpcRequest) data: RpcRequest): Promise<void> {
-        return this.favoriteItemService.destroy(data.params[0]);
+        const favItem: resources.FavoriteItem = data.params[0];
+        return this.favoriteItemService.destroy(favItem.id);
     }
 
     public async validate(data: RpcRequest): Promise<RpcRequest> {
