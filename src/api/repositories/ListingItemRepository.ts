@@ -10,7 +10,6 @@ import { DatabaseException } from '../exceptions/DatabaseException';
 import { NotFoundException } from '../exceptions/NotFoundException';
 import { Logger as LoggerType } from '../../core/Logger';
 import { ListingItemSearchParams } from '../requests/search/ListingItemSearchParams';
-import {Proposal} from '../models/Proposal';
 
 export class ListingItemRepository {
 
@@ -24,8 +23,8 @@ export class ListingItemRepository {
     }
 
     public async findAll(): Promise<Bookshelf.Collection<ListingItem>> {
-        const list = await this.ListingItemModel.fetchAll();
-        return list as Bookshelf.Collection<ListingItem>;
+        const list = await this.ListingItemModel.fetchAll<ListingItem>();
+        return list;
     }
 /*
     public async findAllByCategory(categoryId: number, withRelated: boolean = true): Promise<Bookshelf.Collection<ListingItem>> {
@@ -44,6 +43,12 @@ export class ListingItemRepository {
      */
     public async findAllByHash(hash: string, withRelated: boolean = true): Promise<Bookshelf.Collection<ListingItem>> {
         return this.ListingItemModel.fetchAllByHash(hash, withRelated);
+    }
+
+    public async findAllByHashAndMarketReceiveAddress(
+        hash: string, marketReceiveAddress: string, withRelated: boolean = true
+    ): Promise<Bookshelf.Collection<ListingItem>> {
+        return this.ListingItemModel.fetchAllByHashAndMarketReceiveAddress(hash, marketReceiveAddress, withRelated);
     }
 
     public async findOne(id: number, withRelated: boolean = true): Promise<ListingItem> {

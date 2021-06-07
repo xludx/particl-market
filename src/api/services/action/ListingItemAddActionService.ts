@@ -157,6 +157,16 @@ export class ListingItemAddActionService extends BaseActionService {
                     // if there's a Proposal to remove the ListingItem, create a FlaggedItem related to the ListingItem
                     await this.createFlaggedItemIfNeeded(listingItem);
 
+                    // if this is a duplicated listingitem and the user has previously flagged the listing item, ensure that this item receives the same vote.
+                    await this.listingItemService.findAllByHashAndMarketReceiveAddress(listingItem.hash, listingItem.market).then(value => {
+                        const sameListings: resources.ListingItem[] = value.toJSON();
+                        const isRemovedByUser = sameListings.find(listing => !!listing.removed);
+
+                        if (isRemovedByUser) {
+                            this.listingItemService.setRemovedFlag(listingItem.id, true);
+                        }
+                    });
+
                     // if there's a matching ListingItemTemplate, create a relation
                     await this.updateListingItemAndTemplateRelationIfNeeded(listingItem);
 

@@ -92,21 +92,24 @@ export class FlaggedItemService {
 
         switch (proposal.category) {
             case ProposalCategory.ITEM_VOTE:
-                const listingItem: resources.ListingItem = await this.listingItemService.findOneByHashAndMarketReceiveAddress(proposal.target, proposal.market)
-                    .then(value => value.toJSON());
+                const listingItems: resources.ListingItem[] = await this.listingItemService.findAllByHashAndMarketReceiveAddress(
+                    proposal.target,
+                    proposal.market
+                ).then(value => value.toJSON());
 
-                let flaggedItem: resources.FlaggedItem;
-
-                if (_.isEmpty(listingItem.FlaggedItem)) {
-                    flaggedItem = await this.create({
-                        proposal_id: proposal.id,
-                        listing_item_id: listingItem.id,
-                        reason: proposal.description
-                    } as FlaggedItemCreateRequest).then(value => value.toJSON());
-                } else {
-                    flaggedItem = await this.findOne(listingItem.FlaggedItem.id).then(value => value.toJSON());
+                for (const listingItem of listingItems) {
+                    let flaggedItem: resources.FlaggedItem;
+                    if (_.isEmpty(listingItem.FlaggedItem)) {
+                        flaggedItem = await this.create({
+                            proposal_id: proposal.id,
+                            listing_item_id: listingItem.id,
+                            reason: proposal.description
+                        } as FlaggedItemCreateRequest).then(value => value.toJSON());
+                    } else {
+                        flaggedItem = await this.findOne(listingItem.FlaggedItem.id).then(value => value.toJSON());
+                    }
+                    flaggedItems.push(flaggedItem);
                 }
-                flaggedItems.push(flaggedItem);
                 break;
 
             case ProposalCategory.MARKET_VOTE:
