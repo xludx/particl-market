@@ -56,10 +56,10 @@ export class ListingItemTemplateFactory implements ModelFactoryInterface {
                     // } as CryptocurrencyAddressCreateRequest,
                     currency: params.currency,
                     basePrice: params.basePrice,
-                    shippingPrice: (params.domesticShippingPrice || params.internationalShippingPrice) ? {
-                        domestic: params.domesticShippingPrice,
-                        international: params.internationalShippingPrice
-                    } as ShippingPriceCreateRequest : undefined
+                    shippingPrice: {
+                        domestic: params.domesticShippingPrice ? params.domesticShippingPrice : 0,
+                        international: params.internationalShippingPrice ? params.internationalShippingPrice : 0
+                    } as ShippingPriceCreateRequest
                 } as ItemPriceCreateRequest,
                 escrow: {
                     type: params.escrowType,
