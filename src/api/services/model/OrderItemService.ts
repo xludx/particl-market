@@ -14,17 +14,36 @@ import { OrderItem } from '../../models/OrderItem';
 import { OrderItemCreateRequest } from '../../requests/model/OrderItemCreateRequest';
 import { OrderItemUpdateRequest } from '../../requests/model/OrderItemUpdateRequest';
 import { OrderItemStatus } from '../../enums/OrderItemStatus';
+import { OrderItemStatusSequence } from '../../enums/OrderItemStatusSequence';
 import { OrderItemSearchParams } from '../../requests/search/OrderItemSearchParams';
 
 export class OrderItemService {
 
     public log: LoggerType;
+    private readonly madctBuyFlowSequence: OrderItemStatusSequence;
 
     constructor(
         @inject(Types.Repository) @named(Targets.Repository.OrderItemRepository) public orderItemRepo: OrderItemRepository,
         @inject(Types.Core) @named(Core.Logger) public Logger: typeof LoggerType
     ) {
         this.log = new Logger(__filename);
+
+        this.madctBuyFlowSequence = {};
+        this.madctBuyFlowSequence[OrderItemStatus.BIDDED] = {
+            nextStates: [OrderItemStatus.BID_CANCELLED, OrderItemStatus.BID_REJECTED, OrderItemStatus.AWAITING_ESCROW]
+        };
+        this.madctBuyFlowSequence[OrderItemStatus.AWAITING_ESCROW] = {
+            nextStates: [OrderItemStatus.BID_CANCELLED, OrderItemStatus.ESCROW_LOCKED]
+        };
+        this.madctBuyFlowSequence[OrderItemStatus.ESCROW_LOCKED] = {
+            nextStates: [OrderItemStatus.BID_CANCELLED, OrderItemStatus.ESCROW_COMPLETED]
+        };
+        this.madctBuyFlowSequence[OrderItemStatus.ESCROW_COMPLETED] = {
+            nextStates: [OrderItemStatus.SHIPPING, OrderItemStatus.COMPLETE]
+        };
+        this.madctBuyFlowSequence[OrderItemStatus.SHIPPING] = {
+            nextStates: [OrderItemStatus.COMPLETE]
+        };
     }
 
     public async findAll(): Promise<Bookshelf.Collection<OrderItem>> {
@@ -99,6 +118,14 @@ export class OrderItemService {
         const updated = await this.orderItemRepo.update(id, orderItem.toJSON());
         this.log.debug('updated OrderItem ' + id + ' status to: ' + updated.Status);
         return updated;
+    }
+
+
+    public isNextStatusValid(currentStatus: OrderItemStatus, toStatus: OrderItemStatus): boolean {
+        if (this.madctBuyFlowSequence[currentStatus]) {
+            return this.madctBuyFlowSequence[currentStatus].nextStates.findIndex(status => toStatus && (status === toStatus)) >= 0;
+        }
+        return false;
     }
 
 }

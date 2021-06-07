@@ -31,6 +31,7 @@ import { BaseBidActionService } from '../BaseBidActionService';
 import { ActionDirection } from '../../enums/ActionDirection';
 import { MarketplaceNotification } from '../../messages/MarketplaceNotification';
 import { BlacklistService } from '../model/BlacklistService';
+import { MessageException } from '../../exceptions/MessageException';
 
 
 export class OrderItemShipActionService extends BaseBidActionService {
@@ -120,9 +121,20 @@ export class OrderItemShipActionService extends BaseBidActionService {
             .then(async value => {
                 const bid: resources.Bid = value.toJSON();
 
-                // this.log.debug('createBid(), bid: ', JSON.stringify(bid, null, 2));
+                const nextOrderStatus = OrderItemStatus.SHIPPING;
 
-                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, OrderItemStatus.SHIPPING);
+                const isValid = bid.ParentBid.OrderItem.status && this.orderItemService.isNextStatusValid(
+                    bid.ParentBid.OrderItem.status,
+                    nextOrderStatus
+                );
+
+                if (!isValid) {
+                    throw new MessageException(
+                        `Invalid orderitem sequence for orderitem id ${bid.ParentBid.OrderItem.id}: ${bid.ParentBid.OrderItem.status} -> ${nextOrderStatus}`
+                    );
+                }
+
+                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, nextOrderStatus);
                 await this.orderService.updateStatus(bid.ParentBid.OrderItem.Order.id, OrderStatus.SHIPPING);
 
                 return await this.bidService.findOne(bid.id, true).then(bidModel => bidModel.toJSON());

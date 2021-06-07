@@ -36,6 +36,7 @@ import { NotifyService } from '../NotifyService';
 import { ActionDirection } from '../../enums/ActionDirection';
 import { MarketplaceNotification } from '../../messages/MarketplaceNotification';
 import { BlacklistService } from '../model/BlacklistService';
+import { MessageException } from '../../exceptions/MessageException';
 
 
 export class EscrowReleaseActionService extends BaseBidActionService {
@@ -156,7 +157,20 @@ export class EscrowReleaseActionService extends BaseBidActionService {
             .then(async value => {
                 const bid: resources.Bid = value.toJSON();
 
-                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, OrderItemStatus.COMPLETE);
+                const nextOrderStatus = OrderItemStatus.COMPLETE;
+
+                const isValid = bid.ParentBid.OrderItem.status && this.orderItemService.isNextStatusValid(
+                    bid.ParentBid.OrderItem.status,
+                    nextOrderStatus
+                );
+
+                if (!isValid) {
+                    throw new MessageException(
+                        `Invalid orderitem sequence for orderitem id ${bid.ParentBid.OrderItem.id}: ${bid.ParentBid.OrderItem.status} -> ${nextOrderStatus}`
+                    );
+                }
+
+                await this.orderItemService.updateStatus(bid.ParentBid.OrderItem.id, nextOrderStatus);
                 await this.orderService.updateStatus(bid.ParentBid.OrderItem.Order.id, OrderStatus.COMPLETE);
 
                 return await this.bidService.findOne(bid.id, true).then(bidModel => bidModel.toJSON());
