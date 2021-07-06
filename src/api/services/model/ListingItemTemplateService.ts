@@ -365,15 +365,38 @@ export class ListingItemTemplateService implements ModelServiceInterface<Listing
      */
     public async updatePaymentAddress(identity: resources.Identity, listingItemTemplate: resources.ListingItemTemplate):
         Promise<resources.ListingItemTemplate> {
+        let cryptocurrencyAddressId = 0;
 
-        const paymentAddress: CryptoAddress = await this.generateCryptoAddressForEscrowType(identity, listingItemTemplate.PaymentInformation.Escrow.type);
-        const cryptocurrencyAddress: resources.CryptocurrencyAddress = await this.cryptocurrencyAddressService.create({
-            profile_id: listingItemTemplate.Profile.id,
-            type: paymentAddress.type,
-            address: paymentAddress.address
-        } as CryptocurrencyAddressCreateRequest).then(value => value.toJSON());
+        if (
+            !_.isEmpty(listingItemTemplate.ParentListingItemTemplate) &&
+            (+listingItemTemplate.ParentListingItemTemplate.id > 0)
+        ) {
+            const parentListingItemTemplate: resources.ListingItemTemplate = await this.findOne(
+                +listingItemTemplate.ParentListingItemTemplate.id
+            ).then(parentTemplate => parentTemplate.toJSON()).catch(err => null);
 
-        await this.itemPriceService.updatePaymentAddress(listingItemTemplate.PaymentInformation.ItemPrice.id, cryptocurrencyAddress.id);
+            if (
+                !_.isEmpty(parentListingItemTemplate.PaymentInformation) &&
+                !_.isEmpty(parentListingItemTemplate.PaymentInformation.ItemPrice) &&
+                !_.isEmpty(parentListingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress) &&
+                (+parentListingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress.id > 0)
+            ) {
+                cryptocurrencyAddressId = parentListingItemTemplate.PaymentInformation.ItemPrice.CryptocurrencyAddress.id;
+            }
+        }
+
+        if (!(+cryptocurrencyAddressId > 0)) {
+            const paymentAddress: CryptoAddress = await this.generateCryptoAddressForEscrowType(identity, listingItemTemplate.PaymentInformation.Escrow.type);
+            const cryptocurrencyAddress: resources.CryptocurrencyAddress = await this.cryptocurrencyAddressService.create({
+                profile_id: listingItemTemplate.Profile.id,
+                type: paymentAddress.type,
+                address: paymentAddress.address
+            } as CryptocurrencyAddressCreateRequest).then(value => value.toJSON());
+
+            cryptocurrencyAddressId = cryptocurrencyAddress.id;
+        }
+
+        await this.itemPriceService.updatePaymentAddress(listingItemTemplate.PaymentInformation.ItemPrice.id, cryptocurrencyAddressId);
         return await this.findOne(listingItemTemplate.id).then(updatedTemplate => updatedTemplate.toJSON());
     }
 
