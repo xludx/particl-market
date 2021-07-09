@@ -43,7 +43,7 @@ export class OrderItemShipCommand extends BaseCommand implements RpcCommandInter
         return {
             params: [
                 new IdValidationRule('orderItemId', true, this.orderItemService),
-                new StringValidationRule('memo', false, 'This ListingItem should be removed.')
+                new StringValidationRule('memo', false, '')
             ] as ParamValidationRule[]
         } as CommandParamValidationRules;
     }
