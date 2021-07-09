@@ -481,7 +481,32 @@ export class CoreRpcService extends CtRpc {
     public async getPrevouts(wallet: string, typeIn: OutputType, typeOut: OutputType, satoshis: number, blind?: string): Promise<BlindPrevout[]> {
         this.log.debug('getPrevouts(), typeIn: ' + typeIn + ', typeOut: ' + typeOut + ', satoshis: ' + satoshis + ', blind: ' + blind);
         const prevOuts: BlindPrevout[] = [];
-        const newPrevOut = await this.createPrevoutFrom(wallet, typeIn, typeOut, satoshis, blind);
+
+        // use current identity address as the address for the transaction
+        let stealthAddress: CryptoAddress | undefined;
+        const addressList: any[] = await this.call('liststealthaddresses', [false, {verbose: true}], wallet).catch(() => []);
+
+        if (
+            Array.isArray(addressList) &&
+            (addressList.length > 0) &&
+            !_.isEmpty(addressList[0]) &&
+            Array.isArray(addressList[0]['Stealth Addresses'])
+        ) {
+            const defaultAddress = addressList[0]['Stealth Addresses'].find(addr =>
+                (Object.prototype.toString.call(addr) === '[object Object]') &&
+                (typeof addr['Address'] === 'string') &&
+                (addr['scan_path'] === "m/0'/0'")
+            );
+
+            if (defaultAddress) {
+                stealthAddress = {
+                    type: CryptoAddressType.STEALTH,
+                    address: defaultAddress['Address']
+                } as CryptoAddress;
+            }
+        }
+
+        const newPrevOut = await this.createPrevoutFrom(wallet, typeIn, typeOut, satoshis, blind, stealthAddress);
         prevOuts.push(newPrevOut);
         return prevOuts;
     }
